@@ -1,0 +1,134 @@
+﻿using System;
+using System.Text;
+
+namespace RightMove
+{
+	public class RightMoveSearchItem : IEquatable<RightMoveSearchItem>
+	{
+		/// <summary>
+		/// Gets or sets the right move id
+		/// </summary>
+		public int RightMoveId 
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Checks if <see cref="other"/> is equal to this instance
+		/// </summary>
+		/// <param name="other">True if equal, false otherwise</param>
+		/// <returns></returns>
+		public bool Equals(RightMoveSearchItem other)
+		{
+			if (ReferenceEquals(null, other)) return false;
+			if (ReferenceEquals(this, other)) return true;
+			return string.Equals(Link, other.Link, StringComparison.InvariantCultureIgnoreCase) && 
+			       string.Equals(HouseInfo, other.HouseInfo, StringComparison.InvariantCultureIgnoreCase) && 
+			       string.Equals(Address, other.Address, StringComparison.InvariantCultureIgnoreCase) && 
+			       string.Equals(Desc, other.Desc, StringComparison.InvariantCultureIgnoreCase) && 
+			       string.Equals(Agent, other.Agent, StringComparison.InvariantCultureIgnoreCase) && 
+			       Date.Equals(other.Date) && 
+			       Price == other.Price;
+					
+			       // Featured == other.Featured; // we choose not to make featured an equality check
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != this.GetType()) return false;
+			return Equals((RightMoveSearchItem) obj);
+		}
+
+		public override int GetHashCode()
+		{
+			var hashCode = new HashCode();
+			hashCode.Add(Link, StringComparer.InvariantCultureIgnoreCase);
+			hashCode.Add(HouseInfo, StringComparer.InvariantCultureIgnoreCase);
+			hashCode.Add(Address, StringComparer.InvariantCultureIgnoreCase);
+			hashCode.Add(Desc, StringComparer.InvariantCultureIgnoreCase);
+			hashCode.Add(Agent, StringComparer.InvariantCultureIgnoreCase);
+			hashCode.Add(Date);
+			hashCode.Add(Price);
+			
+			// hashCode.Add(Featured);
+			return hashCode.ToHashCode();
+		}
+
+		public string Link
+		{
+			get;
+			set;
+		}
+
+		public string HouseInfo
+		{
+			get;
+			set;
+		}
+
+		public string Address 
+		{
+			get;
+			set;
+		}
+
+		public string Desc
+		{
+			get;
+			set;
+		}
+
+		public string Agent
+		{
+			get;
+			set;
+		}
+
+		public DateTime Date
+		{
+			get;
+			set;
+		}
+
+		public int Price
+		{
+			get;
+			set;
+		}
+
+		public bool Featured
+		{
+			get;
+			set;
+		}
+
+		public string Url
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(Link))
+				{
+					return null;
+				}
+
+				return $"{RightMoveUrls.RightMoveUrl}{Link}";
+			}
+		}
+		
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(string.Format("{0} : {1}\n", nameof(RightMoveId), RightMoveId));
+			sb.Append(string.Format("{0} : {1}\n", nameof(HouseInfo), HouseInfo));
+			sb.Append(string.Format("{0} : {1}\n", nameof(Address), Address));
+			sb.Append(string.Format("{0} : {1}\n", nameof(Date), Date));
+			sb.Append(string.Format("{0} : {1}\n", nameof(Link), Link));
+
+			return sb.ToString();
+		}
+	}
+}

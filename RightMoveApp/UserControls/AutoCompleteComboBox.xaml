@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="RightMoveApp.UserControls.AutoCompleteComboBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RightMoveApp.UserControls"
+             mc:Ignorable="d" 
+             Panel.ZIndex="10">
+    <Canvas>
+        <TextBox x:Name="txtAuto" 
+                 Height="25" MinWidth="150" 
+                 Margin="0,0,10,0" TextWrapping="NoWrap" />
+        <ListBox x:Name="lstSuggestion"
+                 SelectionChanged="ListBox_SelectionChanged"
+                 MouseDoubleClick="ListBox_MouseDoubleClick"
+                 Background="LightYellow" 
+                 Visibility="Collapsed" 
+                 MinWidth="150" 
+                 Margin="0,25,0,-25"/>
+    </Canvas>
+</UserControl>
