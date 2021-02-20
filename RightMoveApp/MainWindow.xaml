@@ -10,7 +10,7 @@
         xmlns:StyleAlias="clr-namespace:RightMove;assembly=RightMove"
         xmlns:controls="clr-namespace:RightMoveApp.UserControls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Language="en-GB">
+        Title="RightMove Scraper" Height="450" Width="800" Language="en-GB">
     <Window.DataContext>
         <ViewModel:MainViewModel/>
     </Window.DataContext>
@@ -46,7 +46,6 @@
                 <Label Grid.Column="0" Grid.Row="0" Content="Search area"/>
 
                 <controls:AutoCompleteComboBox Grid.Row="0" Grid.Column="1"
-                                       SelectedValue="{Binding Path=SelectedCountry}"
                                        ItemsSource="{Binding Path=SearchString}" />
 
                 <Label Grid.Column="0" Grid.Row="1" Content="Search radius"/>
@@ -128,27 +127,15 @@
                 </ComboBox>
             </Grid>
         </GroupBox>
-        <ListView x:Name="listView" Grid.Column="0" Grid.Row="1" 
-                  ItemsSource="{Binding RightMoveList}" 
-                  SelectedItem="{Binding RightMoveSelectedItem}"
-                  GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
-            <ListView.ContextMenu>
+        <controls:CustomListView x:Name="listView" Grid.Column="0" Grid.Row="1" 
+                                 ItemsSource="{Binding Path=RightMoveList}" 
+                                 SelectedItem="{Binding RightMoveSelectedItem}">
+            <controls:CustomListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Open Link" Command="{Binding OpenLink}" CommandParameter="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}" />
                 </ContextMenu>
-            </ListView.ContextMenu>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}"/>
-                    <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Price, StringFormat={}{0:C0}.00}"/>
-                    <GridViewColumn Header="House Type" DisplayMemberBinding="{Binding HouseInfo}"/>
-                    <GridViewColumn Header="Address" DisplayMemberBinding="{Binding Address}"/>
-                    <GridViewColumn Header="Desc" DisplayMemberBinding="{Binding Desc}"/>
-                    <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}"/>
-                    <GridViewColumn Header="Agent" DisplayMemberBinding="{Binding Agent}"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+            </controls:CustomListView.ContextMenu>
+        </controls:CustomListView>
         <Button x:Name="btnSearch" Grid.Column="0" Grid.Row="2" Content="Search" Command="{Binding SearchCommand}"/>
     </Grid>
 </Window>

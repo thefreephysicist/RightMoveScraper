@@ -9,12 +9,24 @@ namespace RightMoveApp.Model
 	{
 		private RightMoveSearchItem _item;
 
+		public RightMoveViewItem()
+		{
+
+		}
 		public RightMoveViewItem(RightMoveSearchItem rightMoveSearchItem)
 		{
 			_item = rightMoveSearchItem;
 		}
 
 		public int Id
+		{
+			get
+			{
+				return _item.Id;
+			}
+		}
+
+		public int RightMoveId
 		{
 			get
 			{

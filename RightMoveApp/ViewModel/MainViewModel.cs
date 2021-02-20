@@ -20,43 +20,35 @@ namespace RightMoveApp.ViewModel
 		public MainViewModel()
 		{
 			RightMoveList = new ObservableCollection<RightMoveViewItem>();
+			RightMoveList.Clear();
+
 			SearchCommand = new RelayCommand(ExecuteSearch, CanExecuteSearch);
 			OpenLink = new RelayCommand(ExecuteOpenLink, CanExecuteOpenLink);
 		}
 
-		private void ExecuteOpenLink(object obj)
-		{
-			if (RightMoveSelectedItem is null)
-			{
-				return;
-			}
-
-			var sInfo = new System.Diagnostics.ProcessStartInfo(RightMoveSelectedItem.Url)
-			{
-				UseShellExecute = true,
-			};
-			System.Diagnostics.Process.Start(sInfo);
-		}
-
-		private bool CanExecuteOpenLink(object arg)
-		{
-			return true;
-		}
-
+		/// <summary>
+		/// Gets the observable collection of <see cref="RightMoveViewItem"/>
+		/// </summary>
 		public ObservableCollection<RightMoveViewItem> RightMoveList 
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Gets or sets the selected <see cref="RightMoveViewItem"/>
+		/// </summary>
 		public RightMoveViewItem RightMoveSelectedItem
 		{
 			get;
 			set;
 		}
-		
+
+		#region Combobox properties
+
+
 		/// <summary>
-		/// Radius entries
+		/// Radius entries bound to combobox
 		/// </summary>
 		public Dictionary<double, string> RadiusEntries
 		{
@@ -77,6 +69,9 @@ namespace RightMoveApp.ViewModel
 			{ 40, "Within 40 miles" }
 		};
 
+		/// <summary>
+		/// Prices bound to combo box
+		/// </summary>
 		public List<int> Prices
 		{
 			get;
@@ -100,6 +95,9 @@ namespace RightMoveApp.ViewModel
 			300000
 		};
 
+		/// <summary>
+		/// Bedrooms bound to combobox
+		/// </summary>
 		public List<int> Bedrooms
 		{
 			get;
@@ -114,41 +112,65 @@ namespace RightMoveApp.ViewModel
 			5
 		};
 
+		#endregion
+
+		#region Selected items
+
+		/// <summary>
+		/// Gets or sets the selected radius
+		/// </summary>
 		public double SelectedRadius
 		{
 			get;
 			set;
 		} = 0;
 
+		/// <summary>
+		/// Gets or sets the minimum selected bedrooms
+		/// </summary>
 		public int MinSelectedBedrooms
 		{
 			get;
 			set;
 		} = 2;
 
+		/// <summary>
+		/// Gets or sets the maximum selected bedrooms
+		/// </summary>
 		public int MaxSelectedBedrooms
 		{
 			get;
 			set;
 		} = 3;
 
+		/// <summary>
+		/// Gets or sets the minimum selected price
+		/// </summary>
 		public int MinSelectedPrice
 		{
 			get;
 			set;
 		} = 150000;
 
+		/// <summary>
+		/// Gets or sets the maximum selected price
+		/// </summary>
 		public int MaxSelectedPrice
 		{
 			get;
 			set;
 		} = 300000;
 
+		/// <summary>
+		/// Gets or sets the area code
+		/// </summary>
 		public string AreaCode
 		{
 			get;
 			set;
 		} = "OL6";
+
+		#endregion
 
 		public SortType SortTypeSelected
 		{
@@ -156,6 +178,9 @@ namespace RightMoveApp.ViewModel
 			set;
 		} = SortType.NewestListed;
 
+		/// <summary>
+		/// Gets the search string
+		/// </summary>
 		public List<string> SearchString
 		{
 			get
@@ -164,12 +189,9 @@ namespace RightMoveApp.ViewModel
 			}
 		}
 
-		public string SelectedString
-		{
-			get;
-			set;
-		}
-
+		/// <summary>
+		/// Gets the <see cref="SearchParams"/>
+		/// </summary>
 		public SearchParams SearchParams
 		{
 			get
@@ -181,33 +203,94 @@ namespace RightMoveApp.ViewModel
 					MaxBedrooms = MaxSelectedBedrooms,
 					MinPrice = MinSelectedPrice,
 					MaxPrice = MaxSelectedPrice,
-					Sort = SortTypeSelected
+					Sort = SortTypeSelected,
+					Radius = SelectedRadius
 				};
 
 				return searchParams;
 			}
 		}
 
+		#region Commands
+
+		/// <summary>
+		/// Gets or sets the search command
+		/// </summary>
 		public ICommand SearchCommand
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Gets or sets the open link command
+		/// </summary>
 		public ICommand OpenLink
 		{
 			get;
 			set;
 		}
-		
+
+		/// <summary>
+		/// Gets or sets the sort command
+		/// </summary>
 		public ICommand SortCommand
 		{
 			get;
 			set;
 		}
 
+
+		#endregion
+
+		#region event handlers
+
 		public event PropertyChangedEventHandler PropertyChanged;
 
+		#endregion
+
+		/// <summary>
+		/// Execute open link command
+		/// </summary>
+		/// <param name="obj">the object</param>
+		private void ExecuteOpenLink(object obj)
+		{
+			if (RightMoveSelectedItem is null)
+			{
+				return;
+			}
+
+			OpenWebpage(RightMoveSelectedItem);
+		}
+
+		/// <summary>
+		/// Open a webpage for the <see cref="RightMoveViewItem"/>
+		/// </summary>
+		/// <param name="item">The <see cref="RightMoveViewItem"/></param>
+		private void OpenWebpage(RightMoveViewItem item)
+		{
+			var sInfo = new System.Diagnostics.ProcessStartInfo(item.Url)
+			{
+				UseShellExecute = true,
+			};
+
+			System.Diagnostics.Process.Start(sInfo);
+		}
+
+		/// <summary>
+		/// Can execute open link command
+		/// </summary>
+		/// <param name="arg">the argument</param>
+		/// <returns>true if can execute, false otherwise</returns>
+		private bool CanExecuteOpenLink(object arg)
+		{
+			return true;
+		}
+		
+		/// <summary>
+		/// The execute search command
+		/// </summary>
+		/// <param name="parameter"></param>
 		private void ExecuteSearch(object parameter)
 		{
 			RightMoveParser parser = new RightMoveParser(SearchParams);
@@ -222,6 +305,11 @@ namespace RightMoveApp.ViewModel
 			}
 		}
 
+		/// <summary>
+		/// THe can execute search command
+		/// </summary>
+		/// <param name="parameter">the parameter</param>
+		/// <returns></returns>
 		private bool CanExecuteSearch(object parameter)
 		{
 			return true;

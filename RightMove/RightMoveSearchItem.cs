@@ -5,6 +5,12 @@ namespace RightMove
 {
 	public class RightMoveSearchItem : IEquatable<RightMoveSearchItem>
 	{
+		public int Id
+		{
+			get;
+			set;
+		}
+		
 		/// <summary>
 		/// Gets or sets the right move id
 		/// </summary>

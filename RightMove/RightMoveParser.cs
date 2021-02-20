@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
@@ -28,7 +29,7 @@ namespace RightMove
 		/// <summary>
 		/// Gets the list of results
 		/// </summary>
-		public List<RightMoveSearchItem> Results
+		public RightMoveSearchItemCollection Results
 		{
 			get;
 			private set;
@@ -48,7 +49,7 @@ namespace RightMove
 			int currentPage = 1;
 			int pageCount = 1;
 
-			List<RightMoveSearchItem> rightMoveItems = new List<RightMoveSearchItem>();
+			RightMoveSearchItemCollection rightMoveItems = new RightMoveSearchItemCollection();
 			
 			// loop through all the pages
 			while (currentPage <= pageCount)

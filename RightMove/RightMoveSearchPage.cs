@@ -8,7 +8,7 @@ namespace RightMove
 		/// <summary>
 		/// Gets the list of <see cref="RightMoveSearchItem"/> on the page
 		/// </summary>
-		public List<RightMoveSearchItem> RightMoveSearchItems
+		public RightMoveSearchItemCollection RightMoveSearchItems
 		{
 			get;
 			set;

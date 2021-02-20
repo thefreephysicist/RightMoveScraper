@@ -10,12 +10,18 @@
     <Compile Update="UserControls\AutoCompleteComboBox.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="UserControls\CustomListView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="UserControls\AutoCompleteComboBox.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="UserControls\CustomListView.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

@@ -74,7 +74,7 @@ namespace RightMove
 
 			var propertyNodes = document.All.Where(m => !string.IsNullOrEmpty(m.Id) && m.Id.StartsWith("property-"));
 
-			HashSet<RightMoveSearchItem> rightMoveItems = new HashSet<RightMoveSearchItem>();
+			RightMoveSearchItemCollection rightMoveItems = new RightMoveSearchItemCollection();
 
 			foreach (var propertyNode in propertyNodes)
 			{
@@ -176,7 +176,7 @@ namespace RightMove
 
 			RightMoveSearchPage rightMovePage = new RightMoveSearchPage()
 			{
-				RightMoveSearchItems = rightMoveItems.ToList(),
+				RightMoveSearchItems = new RightMoveSearchItemCollection(rightMoveItems),
 				PageCount = page,
 				CurrentPage = currentPage,
 				ResultsCount = resultsCount

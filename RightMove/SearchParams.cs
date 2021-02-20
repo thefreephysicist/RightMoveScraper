@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -28,10 +29,28 @@ namespace RightMove
 			public const string PropertyType = "propertyTypes";
 			public const string IncludeSSTC = "includeSSTC";
 			public const string SortType = "sortType";
+			public const string Radius = "radius";
 		}
 
+		private static readonly List<double> AllowedRadiusValues = new List<double>()
+		{
+			0,
+			0.25,
+			0.5,
+			1,
+			3,
+			5,
+			10,
+			15,
+			20,
+			30,
+			40
+		};
+
+		private double _radius;
+
 		/// <summary>
-		/// Create a new isntance of the <see cref="SearchParams"/> class.
+		/// Create a new instance of the <see cref="SearchParams"/> class.
 		/// </summary>
 		public SearchParams()
 		{
@@ -101,6 +120,27 @@ namespace RightMove
 		}
 
 		/// <summary>
+		/// Gets or sets the radius
+		/// </summary>
+		/// <remarks>There are a set allowed values for radius in <see cref="AllowedRadiusValues"/></remarks>
+		public double Radius
+		{
+			get
+			{
+				return _radius;
+			}
+			set
+			{
+				if (!AllowedRadiusValues.Contains(_radius))
+				{
+					throw new ArgumentException(nameof(Radius));
+				}
+
+				_radius = value;
+			}
+		}
+
+		/// <summary>
 		/// Generates the options string
 		/// </summary>
 		/// <returns>the options string</returns>
@@ -145,6 +185,11 @@ namespace RightMove
 			}
 
 			options.Add(Option.SortType, ((int)Sort).ToString());
+
+			if (Radius > 0)
+			{
+				options.Add(Option.Radius, Radius.ToString(CultureInfo.InvariantCulture));
+			}
 
 			return UrlHelper.ConvertDictionaryToEncodedOptions(options);
 		}
