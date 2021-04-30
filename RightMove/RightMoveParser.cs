@@ -41,7 +41,7 @@ namespace RightMove
 		/// <returns>true if successful, false otherwise</returns>
 		public async Task<bool> SearchAsync()
 		{
-			string searchUrl = $"{RightMoveUrls.FindUrl}?{SearchParams.EncodeOptions()}";
+			string searchUrl = $"{RightMoveUrls.SearchUrl}?{SearchParams.EncodeOptions()}";
 
 			// the multiple for the page number
 			int multiple = 24;
@@ -74,7 +74,7 @@ namespace RightMove
 					pageCount = (int)Math.Ceiling(rightMovePage.ResultsCount / 24.0);
 				}
 
-				rightMoveItems.AddRange(rightMovePage.RightMoveSearchItems);
+				rightMoveItems.AddRangeUnique(rightMovePage.RightMoveSearchItems);
 				
 				// increment the page number
 				currentPage++;
@@ -88,13 +88,13 @@ namespace RightMove
 		}
 
 		/// <summary>
-		/// Parse a right move search page
+		/// ParseDate a right move search page
 		/// </summary>
 		/// <param name="searchUrl"></param>
 		/// <returns>returns <see cref="RightMoveSearchPage"/> is successful, or null otherwise</returns>
 		private async Task<RightMoveSearchPage> ParseRightMoveSearchPageAsync(string searchUrl)
 		{
-			var document = await GetDocument(searchUrl);
+			var document = await HttpHelper.GetDocument(searchUrl);
 
 			if (document is null)
 			{
@@ -103,19 +103,6 @@ namespace RightMove
 
 			RightMoveSearchPageParser searchPageParser = new RightMoveSearchPageParser(document);
 			return searchPageParser.Page;
-		}
-
-		/// <summary>
-		/// Get a document from a url
-		/// </summary>
-		/// <param name="url">the url</param>
-		/// <returns>Returns the <see cref="IDocument"/></returns>
-		private async Task<IDocument> GetDocument(string url)
-		{
-			var config = Configuration.Default.WithDefaultLoader();
-			var context = BrowsingContext.New(config);
-			var document = await context.OpenAsync(url);
-			return document;
 		}
 	}
 }

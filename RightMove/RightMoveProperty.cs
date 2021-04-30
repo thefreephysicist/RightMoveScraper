@@ -3,8 +3,11 @@ using System.Text;
 
 namespace RightMove
 {
-	public class RightMoveSearchItem : IEquatable<RightMoveSearchItem>
+	public class RightMoveProperty : IEquatable<RightMoveProperty>
 	{
+		/// <summary>
+		/// Gets or sets the id
+		/// </summary>
 		public int Id
 		{
 			get;
@@ -25,7 +28,7 @@ namespace RightMove
 		/// </summary>
 		/// <param name="other">True if equal, false otherwise</param>
 		/// <returns></returns>
-		public bool Equals(RightMoveSearchItem other)
+		public bool Equals(RightMoveProperty other)
 		{
 			if (ReferenceEquals(null, other)) return false;
 			if (ReferenceEquals(this, other)) return true;
@@ -40,14 +43,24 @@ namespace RightMove
 			       // Featured == other.Featured; // we choose not to make featured an equality check
 		}
 
+		/// <summary>
+		/// Check if two objects are equal
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns>true if equal, false otherwise</returns>
 		public override bool Equals(object obj)
 		{
 			if (ReferenceEquals(null, obj)) return false;
 			if (ReferenceEquals(this, obj)) return true;
 			if (obj.GetType() != this.GetType()) return false;
-			return Equals((RightMoveSearchItem) obj);
+			return Equals((RightMoveProperty) obj);
 		}
 
+		/// <summary>
+		/// Get the hash code
+		/// </summary>
+		/// <returns>returns the hash code<returns>
+		/// <remarks></remarks>
 		public override int GetHashCode()
 		{
 			var hashCode = new HashCode();

@@ -68,5 +68,14 @@ namespace RightMove.Properties {
                 return ResourceManager.GetString("Outcodes", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {&quot;Abbots Langley, Hertfordshire&quot;:1,&quot;Aberaeron, Cardiganshire, Ceredigion, Mid Wales&quot;:2,&quot;Aberdare, South Glamorgan, Rhondda Cynon Taff&quot;:3,&quot;Aberdeen, Aberdeenshire&quot;:4,&quot;Aberdyfi, Merionethshire, Gwynedd, Mid Wales&quot;:5,&quot;Aberfeldy, Perthshire&quot;:6,&quot;Abergavenny, Monmouthshire&quot;:7,&quot;Abergele, Conwy (County of)&quot;:8,&quot;Aberlour, Banffshire&quot;:9,&quot;Abertillery, Gwent, Blaenau Gwent&quot;:10,&quot;Aberystwyth, Ceredigion, Mid Wales&quot;:11,&quot;Abingdon-on-Thames, Oxfordshire&quot;:12,&quot;Aboyne, Aberdeenshire&quot;:13,&quot;Accrington, Lancashire&quot;:14,&quot;Acharacle, A [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Regions {
+            get {
+                return ResourceManager.GetString("Regions", resourceCulture);
+            }
+        }
     }
 }

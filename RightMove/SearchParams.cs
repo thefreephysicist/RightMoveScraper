@@ -32,6 +32,38 @@ namespace RightMove
 			public const string Radius = "radius";
 		}
 
+		/// <summary>
+	    /// Gets or sets the selected radius
+		/// </summary>
+		private const double DefaultRadius = 0;
+
+		/// <summary>
+		/// Gets or sets the minimum selected bedrooms
+		/// </summary>
+		private const int DefaultMinBedrooms = 2;
+
+		/// <summary>
+		/// Gets or sets the maximum selected bedrooms
+		/// </summary>
+		private const int DefaultMaxBedrooms = 3;
+
+		/// <summary>
+		/// Gets or sets the minimum selected price
+		/// </summary>
+		private const int DefaultMinPrice = 150000;
+
+		/// <summary>
+		/// Gets or sets the maximum selected price
+		/// </summary>
+		private const int DefaultMaxPrice = 300000;
+
+		/// <summary>
+		/// Gets or sets the area code
+		/// </summary>
+		private const string DefaultAreaCode = "OL6";
+
+		public SortType DefaultSort = SortType.NewestListed;
+
 		private static readonly List<double> AllowedRadiusValues = new List<double>()
 		{
 			0,
@@ -54,12 +86,27 @@ namespace RightMove
 		/// </summary>
 		public SearchParams()
 		{
+			MinBedrooms = DefaultMinBedrooms;
+			MaxBedrooms = DefaultMaxBedrooms;
+			MinPrice = DefaultMinPrice;
+			MaxPrice = DefaultMaxPrice;
+			Sort = DefaultSort;
+			Radius = DefaultRadius;
 		}
 
 		/// <summary>
 		/// Gets or sets the location
 		/// </summary>
-		public string Location
+		public string OutcodeLocation
+		{
+			get;
+			set;
+		}
+		
+		/// <summary>
+		/// Gets or sets the region location
+		/// </summary>
+		public string RegionLocation
 		{
 			get;
 			set;
@@ -148,9 +195,9 @@ namespace RightMove
 		{
 			Dictionary<string, string> options = new Dictionary<string, string>();
 
-			if (!string.IsNullOrEmpty(Location))
+			if (!string.IsNullOrEmpty(OutcodeLocation))
 			{
-				string outcodeString = GenerateOutcodeOption(Location);
+				string outcodeString = GenerateOutcodeOption(OutcodeLocation);
 				if (string.IsNullOrEmpty(outcodeString))
 				{
 					throw new ArgumentException("invalid area code");
@@ -158,7 +205,16 @@ namespace RightMove
 				
 				options.Add(Option.LocationIdentifier, outcodeString);
 			}
-			
+			else if (!string.IsNullOrEmpty(RegionLocation))
+			{
+				string regionString = GenerateRegionOption(RegionLocation);
+				if (string.IsNullOrEmpty(regionString))
+				{
+					throw new ArgumentException("invalid region code");
+				}
+				options.Add(Option.LocationIdentifier, regionString);
+			}
+
 			if (MinBedrooms > 0)
 			{
 				options.Add(Option.MinBedrooms, MinBedrooms.ToString());
@@ -201,12 +257,28 @@ namespace RightMove
 		/// <returns>the outcode option</returns>
 		private string GenerateOutcodeOption(string areacode)
 		{
-			if (!RightMoveCodes.OutcodeDictionary.TryGetValue(Location, out int outcode))
+			if (!RightMoveCodes.OutcodeDictionary.TryGetValue(OutcodeLocation, out int outcode))
 			{
 				return null;
 			}
 
 			return $"OUTCODE^{outcode}";
 		}
+
+		/// <summary>
+		/// Generate outcode option
+		/// </summary>
+		/// <param name="regionCode">the area code</param>
+		/// <returns>the region option</returns>
+		private string GenerateRegionOption(string regionCode)
+		{
+			if (!RightMoveCodes.RegionDictionary.TryGetValue(regionCode, out int region))
+			{
+				return null;
+			}
+
+			return $"REGION^{region}";
+		}
+
 	}
 }

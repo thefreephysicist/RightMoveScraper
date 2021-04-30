@@ -7,14 +7,23 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="ImageWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="UserControls\AutoCompleteComboBox.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="UserControls\CustomListView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="UserControls\SearchParamsControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="ImageWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -22,6 +31,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="UserControls\CustomListView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="UserControls\SearchParamsControl.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

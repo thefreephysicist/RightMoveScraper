@@ -44,6 +44,7 @@ namespace RightMove
 			{
 				if (failedCount > 30)
 				{
+					WriteLine($"Something went wrong at i = {i}");
 					break;
 				}
 
@@ -51,10 +52,14 @@ namespace RightMove
 				
 				SearchParams searchParams = new SearchParams()
 				{
-					Location = location
+					OutcodeLocation = location
 				};
 
-				string searchUrl = $"{RightMoveUrls.FindUrl}?{searchParams.EncodeOptions()}";
+				Dictionary<string, string> options = new Dictionary<string, string>();
+				
+				options.Add("locationIdentifier", $"REGION^{i}");
+				var encodedOptions = UrlHelper.ConvertDictionaryToEncodedOptions(options);
+				string searchUrl = $"{RightMoveUrls.SearchUrl}?{encodedOptions}";
 
 				var outcode = GetOutcodeFromDocumentAsync(searchUrl);
 
@@ -66,7 +71,7 @@ namespace RightMove
 
 				regionDictionary.Add(i.ToString(), await outcode);
 				failedCount = 0;
-				WriteLine(string.Format("{0} : {1}", i.ToString(), await outcode));
+				WriteLine(string.Format("{0}: {1}", i.ToString(), await outcode));
 			}
 
 			using (StreamWriter s = new StreamWriter("regions.json"))

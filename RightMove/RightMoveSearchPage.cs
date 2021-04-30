@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace RightMove
 {
-	public class RightMoveSearchPage : IEnumerable<RightMoveSearchItem>
+	public class RightMoveSearchPage : IEnumerable<RightMoveProperty>
 	{
 		/// <summary>
-		/// Gets the list of <see cref="RightMoveSearchItem"/> on the page
+		/// Gets the list of <see cref="RightMoveProperty"/> on the page
 		/// </summary>
 		public RightMoveSearchItemCollection RightMoveSearchItems
 		{
@@ -41,7 +41,7 @@ namespace RightMove
 			set;
 		}
 
-		public IEnumerator<RightMoveSearchItem> GetEnumerator()
+		public IEnumerator<RightMoveProperty> GetEnumerator()
 		{
 			return RightMoveSearchItems.GetEnumerator();
 		}

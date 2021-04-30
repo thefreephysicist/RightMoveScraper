@@ -7,13 +7,13 @@ namespace RightMoveApp.Model
 {
 	public class RightMoveViewItem
 	{
-		private RightMoveSearchItem _item;
+		private RightMoveProperty _item;
 
 		public RightMoveViewItem()
 		{
 
 		}
-		public RightMoveViewItem(RightMoveSearchItem rightMoveSearchItem)
+		public RightMoveViewItem(RightMoveProperty rightMoveSearchItem)
 		{
 			_item = rightMoveSearchItem;
 		}
@@ -85,6 +85,14 @@ namespace RightMoveApp.Model
 		public string Url
 		{
 			get { return _item.Url; }
+		}
+		
+		public bool Featured
+		{
+			get
+			{
+				return _item.Featured;
+			}
 		}
 	}
 }

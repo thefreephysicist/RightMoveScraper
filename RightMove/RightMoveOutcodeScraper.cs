@@ -41,10 +41,10 @@ namespace RightMove
 				var location = string.Format("OUTCODE^{0}", i);
 				SearchParams searchParams = new SearchParams()
 				{
-					Location = location
+					OutcodeLocation = location
 				};
 
-				string searchUrl = string.Format("{0}?{1}", RightMoveUrls.FindUrl, searchParams.EncodeOptions());
+				string searchUrl = string.Format("{0}?{1}", RightMoveUrls.SearchUrl, searchParams.EncodeOptions());
 
 				var outcode = GetOutcodeFromDocumentAsync(searchUrl);
 

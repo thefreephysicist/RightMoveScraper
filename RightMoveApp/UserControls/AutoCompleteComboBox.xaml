@@ -10,10 +10,12 @@
         <Canvas HorizontalAlignment="Stretch">
             <TextBox x:Name="txtAuto" 
                      Height="25" MinWidth="150" 
-                     Margin="0,0,10,0" TextWrapping="NoWrap">
+                     Margin="0,0,10,0" TextWrapping="NoWrap"
+                     Text="{Binding Path=SelectedValue, RelativeSource={RelativeSource AncestorType={x:Type local:AutoCompleteComboBox}}, UpdateSourceTrigger=PropertyChanged}">
                 <TextBox.Width>
                     <Binding Path="ActualWidth" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type Canvas}}"/>
                 </TextBox.Width>
+
             </TextBox>
             <ListBox x:Name="lstSuggestion"
                      SelectionChanged="ListBox_SelectionChanged"

@@ -1,6 +1,7 @@
 ﻿using AngleSharp.Dom;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -49,7 +50,9 @@ namespace RightMove
 			private set;
 		}
 
-		internal RightMoveSearchPage ParseRightMoveSearchPage(IDocument document)
+		
+		
+		private void ParseRightMoveSearchPage(IDocument document)
 		{
 			var pageText = document.Body.QuerySelector(Selector.PageCount)?.Text();
 
@@ -61,11 +64,11 @@ namespace RightMove
 
 			var resultCountText = document.Body.QuerySelector(Selector.ResultsCount)?.Text();
 
-			if (!int.TryParse(resultCountText, out int resultsCount))
+			if (!int.TryParse(resultCountText, NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out int resultsCount))
 			{
 				resultsCount = -1;
 			}
-			
+
 			var currentPageText = document.QuerySelector(Selector.CurrentPage)?.Text();
 			if (!int.TryParse(currentPageText, out int currentPage))
 			{
@@ -110,55 +113,21 @@ namespace RightMove
 				// dateAndAgent is in the form "Added on 01/02/2021 by Melissa Berry Sales & Lettings, Prestwich"
 				if (!string.IsNullOrEmpty(dateAndAgentText))
 				{
-					string addedOn = "Added on ";
-					string reducedOn = "Reduced on ";
-					int ind = dateAndAgentText.IndexOf(addedOn, StringComparison.CurrentCultureIgnoreCase);
-					int length = addedOn.Length;
-
-					if (ind < 0)
-					{
-						ind = dateAndAgentText.IndexOf(reducedOn, StringComparison.CurrentCultureIgnoreCase);
-						length = reducedOn.Length;
-					}
-
-					if (ind >= 0)
-					{
-						var dateString = dateAndAgentText.Substring(ind + length, 10);
-						if (!DateTime.TryParse(dateString, out date))
-						{
-
-						}
-
-					}
-
-					ind = dateAndAgentText.IndexOf("by ", StringComparison.CurrentCultureIgnoreCase);
-					if (ind >= 0)
-					{
-						agent = dateAndAgentText.Substring(ind + 3);
-						agent = StringHelper.TrimUp(agent);
-					}
+					date = RightMoveParserHelper.ParseDate(dateAndAgentText);
+					agent = RightMoveParserHelper.ParseAgent(dateAndAgentText);
 				}
 
 				var priceText = propertyNode.QuerySelector(Selector.Price)?.Text();
 
-				Regex reg = new Regex(@"[0-9,]+");
-				var match = reg.Match(priceText);
-
-				if (match.Success && int.TryParse(match.Value.Replace(",", ""), out price))
-				{
-				}
-				else
-				{
-					price = -1;
-				}
+				price = RightMoveParserHelper.ParsePrice(priceText);
 
 				var featuredText = propertyNode.QuerySelector(Selector.Featured)?.Text();
-				if (featuredText.IndexOf("featured", StringComparison.CurrentCultureIgnoreCase) >= 0)
+				if (featuredText?.IndexOf("featured", StringComparison.CurrentCultureIgnoreCase) >= 0)
 				{
 					featured = true;
 				}
 
-				RightMoveSearchItem rightMoveItem = new RightMoveSearchItem()
+				RightMoveProperty rightMoveItem = new RightMoveProperty()
 				{
 					RightMoveId = rightMoveId,
 					HouseInfo = houseType,
@@ -183,9 +152,6 @@ namespace RightMove
 			};
 
 			Page = rightMovePage;
-			
-			return rightMovePage;
 		}
-
 	}
 }

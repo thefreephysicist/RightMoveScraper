@@ -12,6 +12,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Linq;
+using System.Threading.Tasks;
+using Utilities;
 
 namespace RightMoveApp.UserControls
 {
@@ -40,9 +42,9 @@ namespace RightMoveApp.UserControls
 		/// Gets or sets the items source.
 		/// 
 		/// The items source.
-		public IEnumerable<string> ItemsSource
+		public StringTrieSet ItemsSource
 		{
-			get { return (IEnumerable<string>)GetValue(ItemsSourceProperty); }
+			get { return (StringTrieSet)GetValue(ItemsSourceProperty); }
 			set { SetValue(ItemsSourceProperty, value); }
 		}
 
@@ -50,7 +52,7 @@ namespace RightMoveApp.UserControls
 		// This enables animation, styling, binding, etc...
 		public static readonly DependencyProperty ItemsSourceProperty =
 			DependencyProperty.Register("ItemsSource"
-								, typeof(IEnumerable)
+								, typeof(StringTrieSet)
 								, typeof(AutoCompleteComboBox)
 								, new UIPropertyMetadata(null));
 
@@ -91,8 +93,11 @@ namespace RightMoveApp.UserControls
 			// Use Linq to Query ItemsSource for resultdata
 			string condition = string.Format("{0}%", txtAuto.Text);
 
-			IEnumerable<string> results = ItemsSource.Where(o => o.ToLower().StartsWith(txtAuto.Text.ToLower()));
-				
+			// IEnumerable<string> results = ItemsSource.Where(o => o.ToLower().StartsWith(txtAuto.Text.ToLower()));
+
+			
+			IEnumerable<string> results = ItemsSource.GetByPrefix(txtAuto.Text);
+
 			if (!results.Any())
 			{
 				lstSuggestion.Visibility = Visibility.Collapsed;
@@ -172,6 +177,7 @@ namespace RightMoveApp.UserControls
 			lstSuggestion.ItemsSource = null;
 			lstSuggestion.Visibility = Visibility.Collapsed;
 		}
+
 		#endregion
 	}
 }

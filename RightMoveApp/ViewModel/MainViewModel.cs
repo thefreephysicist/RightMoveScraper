@@ -12,18 +12,25 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using AngleSharp;
+using RightMoveApp.UserControls;
 
 namespace RightMoveApp.ViewModel
 {
 	public class MainViewModel : INotifyPropertyChanged
 	{
+		private readonly IWindowFactory _windowFactory;
+
 		public MainViewModel()
 		{
 			RightMoveList = new ObservableCollection<RightMoveViewItem>();
 			RightMoveList.Clear();
 
-			SearchCommand = new RelayCommand(ExecuteSearch, CanExecuteSearch);
+			SearchAsyncCommand = new AsyncRelayCommand(ExecuteSearch, CanExecuteSearch);
 			OpenLink = new RelayCommand(ExecuteOpenLink, CanExecuteOpenLink);
+			ViewImages = new RelayCommand(ExecuteViewImages, CanExecuteViewImages);
+			SearchParams = new SearchParams();
+
+			IsNotSearching = true;
 		}
 
 		/// <summary>
@@ -44,179 +51,21 @@ namespace RightMoveApp.ViewModel
 			set;
 		}
 
-		#region Combobox properties
-
-
 		/// <summary>
-		/// Radius entries bound to combobox
-		/// </summary>
-		public Dictionary<double, string> RadiusEntries
-		{
-			get;
-			set;
-		} = new Dictionary<double, string>()
-		{
-			{0, "This area only" },
-			{ 0.25, "Within 1/4 mile" },
-			{ 0.5, "Within 1/2 mile" },
-			{ 1, "Within 1 mile" },
-			{ 3, "Within 3 miles" },
-			{ 5, "Within 5 miles" },
-			{ 10, "Within 10 miles" },
-			{ 15, "Within 15 miles" },
-			{ 20, "Within 20 miles" },
-			{ 30, "Within 30 miles" },
-			{ 40, "Within 40 miles" }
-		};
-
-		/// <summary>
-		/// Prices bound to combo box
-		/// </summary>
-		public List<int> Prices
-		{
-			get;
-			set;
-		} = new List<int>()
-		{
-			0,
-			50000,
-			60000,
-			70000,
-			80000,
-			90000,
-			100000,
-			110000,
-			120000,
-			125000,
-			130000,
-			150000,
-			200000,
-			250000,
-			300000
-		};
-
-		/// <summary>
-		/// Bedrooms bound to combobox
-		/// </summary>
-		public List<int> Bedrooms
-		{
-			get;
-			set;
-		} = new List<int>()
-		{
-			0,
-			1,
-			2,
-			3,
-			4,
-			5
-		};
-
-		#endregion
-
-		#region Selected items
-
-		/// <summary>
-		/// Gets or sets the selected radius
-		/// </summary>
-		public double SelectedRadius
-		{
-			get;
-			set;
-		} = 0;
-
-		/// <summary>
-		/// Gets or sets the minimum selected bedrooms
-		/// </summary>
-		public int MinSelectedBedrooms
-		{
-			get;
-			set;
-		} = 2;
-
-		/// <summary>
-		/// Gets or sets the maximum selected bedrooms
-		/// </summary>
-		public int MaxSelectedBedrooms
-		{
-			get;
-			set;
-		} = 3;
-
-		/// <summary>
-		/// Gets or sets the minimum selected price
-		/// </summary>
-		public int MinSelectedPrice
-		{
-			get;
-			set;
-		} = 150000;
-
-		/// <summary>
-		/// Gets or sets the maximum selected price
-		/// </summary>
-		public int MaxSelectedPrice
-		{
-			get;
-			set;
-		} = 300000;
-
-		/// <summary>
-		/// Gets or sets the area code
-		/// </summary>
-		public string AreaCode
-		{
-			get;
-			set;
-		} = "OL6";
-
-		#endregion
-
-		public SortType SortTypeSelected
-		{
-			get;
-			set;
-		} = SortType.NewestListed;
-
-		/// <summary>
-		/// Gets the search string
-		/// </summary>
-		public List<string> SearchString
-		{
-			get
-			{
-				return RightMoveCodes.OutcodeDictionary.Select(o => o.Key).ToList();
-			}
-		}
-
-		/// <summary>
-		/// Gets the <see cref="SearchParams"/>
+		/// Gets or sets the <see cref="SearchParams"/>
 		/// </summary>
 		public SearchParams SearchParams
 		{
-			get
-			{
-				SearchParams searchParams = new SearchParams()
-				{
-					Location = AreaCode,
-					MinBedrooms = MinSelectedBedrooms,
-					MaxBedrooms = MaxSelectedBedrooms,
-					MinPrice = MinSelectedPrice,
-					MaxPrice = MaxSelectedPrice,
-					Sort = SortTypeSelected,
-					Radius = SelectedRadius
-				};
-
-				return searchParams;
-			}
+			get;
+			set;
 		}
-
+		
 		#region Commands
 
 		/// <summary>
 		/// Gets or sets the search command
 		/// </summary>
-		public ICommand SearchCommand
+		public ICommand SearchAsyncCommand
 		{
 			get;
 			set;
@@ -231,6 +80,12 @@ namespace RightMoveApp.ViewModel
 			set;
 		}
 
+		public ICommand ViewImages
+		{
+			get;
+			set;
+		}
+		
 		/// <summary>
 		/// Gets or sets the sort command
 		/// </summary>
@@ -240,6 +95,7 @@ namespace RightMoveApp.ViewModel
 			set;
 		}
 
+		public bool IsNotSearching { get; set; }
 
 		#endregion
 
@@ -249,6 +105,21 @@ namespace RightMoveApp.ViewModel
 
 		#endregion
 
+		private void ExecuteViewImages(object obj)
+		{
+			if (RightMoveSelectedItem is null)
+			{
+				return;
+			}
+			
+			_windowFactory.CreateWindow();
+		}
+
+		private bool CanExecuteViewImages(object arg)
+		{
+			return true;
+		}
+		
 		/// <summary>
 		/// Execute open link command
 		/// </summary>
@@ -291,10 +162,12 @@ namespace RightMoveApp.ViewModel
 		/// The execute search command
 		/// </summary>
 		/// <param name="parameter"></param>
-		private void ExecuteSearch(object parameter)
+		private async Task ExecuteSearch(object parameter)
 		{
+			IsNotSearching = false;
+			
 			RightMoveParser parser = new RightMoveParser(SearchParams);
-			Task.Run(async () => await parser.SearchAsync()).Wait();
+			await parser.SearchAsync();
 
 			RightMoveList.Clear();
 
@@ -303,6 +176,8 @@ namespace RightMoveApp.ViewModel
 				RightMoveViewItem item = new RightMoveViewItem(res);
 				RightMoveList.Add(item);
 			}
+			
+			IsNotSearching = true;
 		}
 
 		/// <summary>

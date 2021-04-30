@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -58,6 +59,11 @@ namespace RightMoveApp.UserControls
 		public static readonly DependencyProperty ItemsSourceProperty =
 			DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(CustomListView), new PropertyMetadata(new PropertyChangedCallback(OnItemsSourcePropertyChanged)));
 
+		/*
+		public static readonly RoutedEvent TapEvent = EventManager.RegisterRoutedEvent(
+			"Tap", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MyButtonSimple));
+		*/
+		
 		/// <summary>
 		/// The on items source proprety changed
 		/// </summary>
@@ -98,6 +104,39 @@ namespace RightMoveApp.UserControls
 		private void NewValueINotifyCollectionChanged_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			//Do your stuff here.
+		}
+
+		private GridViewColumnHeader lastHeaderClicked;
+		private ListSortDirection lastDirection = ListSortDirection.Ascending;
+
+		private void GridViewColumnHeaderClickedHandler(object sender, RoutedEventArgs e)
+		{
+			if (!(e.OriginalSource is GridViewColumnHeader ch)) return;
+			var dir = ListSortDirection.Ascending;
+			if (ch == lastHeaderClicked && lastDirection == ListSortDirection.Ascending)
+				dir = ListSortDirection.Descending;
+			Sort(ch, dir);
+			lastHeaderClicked = ch; lastDirection = dir;
+		}
+
+		private void Sort(GridViewColumnHeader ch, ListSortDirection dir)
+		{
+			var bn = (ch.Column.DisplayMemberBinding as Binding)?.Path.Path;
+			bn = bn ?? ch.Column.Header as string;
+			var dv = CollectionViewSource.GetDefaultView(listView.ItemsSource);
+			dv.SortDescriptions.Clear();
+			var sd = new SortDescription(bn, dir);
+			dv.SortDescriptions.Add(sd);
+			dv.Refresh();
+		}
+
+		private void CustomListView_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			if (!(e.OriginalSource is TextBlock))
+			{
+				e.Handled = true;
+				return;
+			}
 		}
 	}
 }
