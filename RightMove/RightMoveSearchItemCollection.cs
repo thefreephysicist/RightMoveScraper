@@ -15,7 +15,7 @@ namespace RightMove
 		private int _id = 0;
 		
 		private readonly List<RightMoveProperty> _lst;
-
+		
 		public RightMoveSearchItemCollection()
 		{
 			_lst = new List<RightMoveProperty>();
@@ -29,6 +29,21 @@ namespace RightMove
 		public RightMoveSearchItemCollection(IEnumerable<RightMoveProperty> lst)
 		{
 			_lst = new List<RightMoveProperty>(lst);
+		}
+
+		public double AveragePrice
+		{
+			get
+			{
+				return CalculateAveragePrice();
+			}
+		}
+		
+		public double CalculateAveragePrice()
+		{
+			return this.Where(o => o.Price != RightMoveParser.PriceNotSet)
+				.Select(o => o.Price)
+				.Average();
 		}
 		
 		public void AddUnique(RightMoveProperty item)
@@ -47,7 +62,8 @@ namespace RightMove
 
 		public void Clear()
 		{
-			throw new NotImplementedException();
+			_lst.Clear();
+			// throw new NotImplementedException();
 		}
 
 		public bool Contains(RightMoveProperty item)

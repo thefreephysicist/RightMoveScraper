@@ -5,15 +5,11 @@ using RightMoveApp.ViewModel;
 
 namespace RightMoveApp
 {
-	public class ProductionWindowFactory : IWindowFactory
+	public class ProductionWindowFactory
 	{
 		public void CreateWindow()
 		{
-			ImageWindow window = new ImageWindow()
-			{
-				DataContext = new ImageViewModel()
-			};
-			window.Show();
+
 		}
 	}
 }

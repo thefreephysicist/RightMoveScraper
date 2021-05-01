@@ -9,25 +9,42 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
-using AngleSharp;
+using GalaSoft.MvvmLight;
+using Microsoft.Extensions.Options;
+using RightMoveApp.Services;
 using RightMoveApp.UserControls;
 
 namespace RightMoveApp.ViewModel
 {
-	public class MainViewModel : INotifyPropertyChanged
+	public class MainViewModel : ViewModelBase, INotifyPropertyChanged
 	{
-		private readonly IWindowFactory _windowFactory;
+		private readonly IWindowService _windowFactory;
+		private readonly NavigationService _navigationService;
+		private readonly ISampleService sampleService;
+		private readonly AppSettings settings;
 
-		public MainViewModel()
+		public MainViewModel(NavigationService navigationService,
+			ISampleService sampleService, 
+			IWindowService _windowService,
+			IOptions<AppSettings> options)
 		{
+			_navigationService = navigationService;
+			this.sampleService = sampleService;
+			_windowFactory = _windowService;
+			settings = options.Value;
+			
 			RightMoveList = new ObservableCollection<RightMoveViewItem>();
+			// RightMoveList = new RightMoveSearchItemCollection();
 			RightMoveList.Clear();
 
 			SearchAsyncCommand = new AsyncRelayCommand(ExecuteSearch, CanExecuteSearch);
 			OpenLink = new RelayCommand(ExecuteOpenLink, CanExecuteOpenLink);
-			ViewImages = new RelayCommand(ExecuteViewImages, CanExecuteViewImages);
+			// ViewImages = new RelayCommand(ExecuteViewImages, CanExecuteViewImages);
+			ViewImages = new AsyncRelayCommand(ExecuteViewImagesAsync, CanExecuteViewImages);
 			SearchParams = new SearchParams();
 
 			IsNotSearching = true;
@@ -42,6 +59,22 @@ namespace RightMoveApp.ViewModel
 			set;
 		}
 
+		/*
+		private RightMoveSearchItemCollection _rightMoveList;
+
+		public RightMoveSearchItemCollection RightMoveList
+		{
+			get
+			{
+				return _rightMoveList;
+			}
+			set
+			{
+				Set(ref _rightMoveList, value);
+			}
+		}
+		*/
+		
 		/// <summary>
 		/// Gets or sets the selected <see cref="RightMoveViewItem"/>
 		/// </summary>
@@ -111,13 +144,18 @@ namespace RightMoveApp.ViewModel
 			{
 				return;
 			}
-			
-			_windowFactory.CreateWindow();
+
+			// _windowFactory.CreateImageWindow();
+		}
+		
+		private Task ExecuteViewImagesAsync(object obj)
+		{
+			return _navigationService.ShowDialogAsync(App.Windows.ImageWindow, RightMoveSelectedItem.RightMoveId);
 		}
 
 		private bool CanExecuteViewImages(object arg)
 		{
-			return true;
+			return RightMoveSelectedItem != null;
 		}
 		
 		/// <summary>
@@ -168,7 +206,12 @@ namespace RightMoveApp.ViewModel
 			
 			RightMoveParser parser = new RightMoveParser(SearchParams);
 			await parser.SearchAsync();
+			/*
+			RightMoveList = parser.Results;
 
+			ObservableCollection<RightMoveProperty> propers = new ObservableCollection<RightMoveProperty>(parser.Results);
+			*/
+			
 			RightMoveList.Clear();
 
 			foreach (var res in parser.Results) 

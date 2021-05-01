@@ -23,6 +23,12 @@ namespace RightMove
 			private set;
 		}
 		
+		public RightMoveProperty RightMoveProperty
+		{
+			get;
+			private set;
+		}
+		
 		public RightMovePropertyPage Page
 		{
 			get;
@@ -35,7 +41,7 @@ namespace RightMove
 			private set;
 		}
 
-		public async Task<bool> ParseRightMovePropretyPageAsync()
+		public async Task<bool> ParseRightMovePropertyPageAsync()
 		{
 			return await ParseRightMovePropertyPageAsync(PropertyId);
 		}
@@ -72,6 +78,9 @@ namespace RightMove
 
 			property.Price = RightMoveParserHelper.ParsePrice(Json.propertyData.prices.primaryPrice);
 			property.Date = RightMoveParserHelper.ParseDate(Json.propertyData.listingHistory.listingUpdateReason);
+			property.ImageUrl = Json.propertyData.images.Select(o => o.url).ToArray();
+
+			RightMoveProperty = property;
 		}
 		
 		private static Rootobject GetJson(IDocument document)

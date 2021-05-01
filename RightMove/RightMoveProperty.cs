@@ -137,6 +137,23 @@ namespace RightMove
 			}
 		}
 		
+		
+		public string[] ImageUrl
+		{
+			get;
+			set;
+		}
+		
+		public byte[] GetImage(int index)
+		{
+			if (index >= ImageUrl.Length || index < 0) 
+			{
+				return null;
+			}
+			
+			return HttpHelper.DownloadRemoveImage(ImageUrl[index]);
+		}
+		
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

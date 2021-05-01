@@ -7,20 +7,25 @@
 
         xmlns:ViewModel="clr-namespace:RightMoveApp.ViewModel"
         mc:Ignorable="d"
-        Title="ImageWindow" Height="450" Width="800">
-    <Window.DataContext>
-        <ViewModel:ImageViewModel/>
-    </Window.DataContext>
+        Title="ImageWindow" Height="450" Width="800"
+        DataContext="{Binding Source={StaticResource Locator}, Path=ImageViewModel}">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Button x:Name="btnLeft" Grid.Column="0" Grid.Row="0" Content="&lt;"/>
-        <Button x:Name="btnRight" Grid.Column="2" Grid.Row="0" Content=">"/>
+        <Button x:Name="btnLeft" Grid.Column="0" Grid.Row="0" 
+                Content="&lt;" 
+                Padding="10"
+                Command="{Binding PrevImageAsyncCommand}"/>
+        <Image x:Name="img" Grid.Column="1" Grid.Row="0" Source="{Binding DisplayedImage}"/>
+        <Button x:Name="btnRight" Grid.Column="2" Grid.Row="0" 
+                Content=">" 
+                Command="{Binding NextImageAsyncCommand}"
+                Padding="10"/>
     </Grid>
 </Window>

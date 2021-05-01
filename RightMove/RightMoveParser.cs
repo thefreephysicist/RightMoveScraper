@@ -9,6 +9,8 @@ namespace RightMove
 {
 	public class RightMoveParser
 	{
+		public const int PriceNotSet = -1;
+		
 		/// <summary>
 		/// Initializes a new instance <see cref="RightMoveParser"/> class
 		/// </summary>

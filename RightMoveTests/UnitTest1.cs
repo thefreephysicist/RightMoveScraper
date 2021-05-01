@@ -59,7 +59,7 @@ namespace RightMoveTests
 			};
 
 			RightMovePropertyPageParser parser = new RightMovePropertyPageParser(90580477);
-			await parser.ParseRightMovePropretyPageAsync();
+			await parser.ParseRightMovePropertyPageAsync();
 		}
 
 		[Test]

@@ -59,11 +59,6 @@ namespace RightMoveApp.UserControls
 		public static readonly DependencyProperty ItemsSourceProperty =
 			DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(CustomListView), new PropertyMetadata(new PropertyChangedCallback(OnItemsSourcePropertyChanged)));
 
-		/*
-		public static readonly RoutedEvent TapEvent = EventManager.RegisterRoutedEvent(
-			"Tap", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MyButtonSimple));
-		*/
-		
 		/// <summary>
 		/// The on items source proprety changed
 		/// </summary>
