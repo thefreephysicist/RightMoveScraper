@@ -102,7 +102,13 @@ namespace RightMove
 
 			var jsonText = script.Text().Trim().Substring(start.Length);
 
-			var json = JsonConvert.DeserializeObject<Rootobject>(jsonText);
+			var settings = new JsonSerializerSettings
+			{
+				NullValueHandling = NullValueHandling.Ignore,
+				MissingMemberHandling = MissingMemberHandling.Ignore
+			};
+			
+			var json = JsonConvert.DeserializeObject<Rootobject>(jsonText, settings);
 			return json;
 		}
 	}

@@ -73,7 +73,33 @@ namespace RightMoveApp.UserControls
 			150000,
 			200000,
 			250000,
-			300000
+			300000,
+			325000,
+			375000,
+			400000,
+			425000,
+			450000,
+			475000,
+			500000,
+			550000,
+			600000,
+			650000,
+			700000,
+			800000,
+			900000,
+			1000000,
+			1250000,
+			1500000,
+			1750000,
+			2000000,
+			2500000,
+			3000000,
+			4000000,
+			5000000,
+			7500000,
+			10000000,
+			15000000,
+			20000000
 		};
 
 		/// <summary>
@@ -93,18 +119,6 @@ namespace RightMoveApp.UserControls
 			5
 		};
 
-		/// <summary>
-		/// Gets the search string
-		/// </summary>
-		/*
-		public List<string> SearchString
-		{
-			get
-			{
-				return RightMoveCodes.RegionDictionary.Select(o => o.Key).ToList();
-			}
-		}
-		*/
 		public StringTrieSet SearchString
 		{
 			get

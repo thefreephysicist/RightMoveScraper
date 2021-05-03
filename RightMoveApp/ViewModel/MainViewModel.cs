@@ -20,7 +20,7 @@ using RightMoveApp.UserControls;
 
 namespace RightMoveApp.ViewModel
 {
-	public class MainViewModel : ViewModelBase, INotifyPropertyChanged
+	public class MainViewModel : ViewModelBase
 	{
 		private readonly IWindowService _windowFactory;
 		private readonly NavigationService _navigationService;
@@ -29,37 +29,38 @@ namespace RightMoveApp.ViewModel
 
 		public MainViewModel(NavigationService navigationService,
 			ISampleService sampleService, 
-			IWindowService _windowService,
+			IWindowService windowService,
 			IOptions<AppSettings> options)
 		{
 			_navigationService = navigationService;
 			this.sampleService = sampleService;
-			_windowFactory = _windowService;
+			_windowFactory = windowService;
 			settings = options.Value;
-			
-			RightMoveList = new ObservableCollection<RightMoveViewItem>();
+
 			// RightMoveList = new RightMoveSearchItemCollection();
-			RightMoveList.Clear();
 
 			SearchAsyncCommand = new AsyncRelayCommand(ExecuteSearch, CanExecuteSearch);
 			OpenLink = new RelayCommand(ExecuteOpenLink, CanExecuteOpenLink);
-			// ViewImages = new RelayCommand(ExecuteViewImages, CanExecuteViewImages);
 			ViewImages = new AsyncRelayCommand(ExecuteViewImagesAsync, CanExecuteViewImages);
 			SearchParams = new SearchParams();
 
 			IsNotSearching = true;
 		}
 
-		/// <summary>
-		/// Gets the observable collection of <see cref="RightMoveViewItem"/>
-		/// </summary>
-		public ObservableCollection<RightMoveViewItem> RightMoveList 
+		private string _info; 
+		
+		public string Info
 		{
-			get;
-			set;
+			get
+			{
+				return _info;
+			}
+			set
+			{
+				Set(ref _info, value);
+			}
 		}
 
-		/*
 		private RightMoveSearchItemCollection _rightMoveList;
 
 		public RightMoveSearchItemCollection RightMoveList
@@ -73,12 +74,11 @@ namespace RightMoveApp.ViewModel
 				Set(ref _rightMoveList, value);
 			}
 		}
-		*/
 		
 		/// <summary>
 		/// Gets or sets the selected <see cref="RightMoveViewItem"/>
 		/// </summary>
-		public RightMoveViewItem RightMoveSelectedItem
+		public RightMoveProperty RightMoveSelectedItem
 		{
 			get;
 			set;
@@ -132,22 +132,6 @@ namespace RightMoveApp.ViewModel
 
 		#endregion
 
-		#region event handlers
-
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		#endregion
-
-		private void ExecuteViewImages(object obj)
-		{
-			if (RightMoveSelectedItem is null)
-			{
-				return;
-			}
-
-			// _windowFactory.CreateImageWindow();
-		}
-		
 		private Task ExecuteViewImagesAsync(object obj)
 		{
 			return _navigationService.ShowDialogAsync(App.Windows.ImageWindow, RightMoveSelectedItem.RightMoveId);
@@ -176,7 +160,7 @@ namespace RightMoveApp.ViewModel
 		/// Open a webpage for the <see cref="RightMoveViewItem"/>
 		/// </summary>
 		/// <param name="item">The <see cref="RightMoveViewItem"/></param>
-		private void OpenWebpage(RightMoveViewItem item)
+		private void OpenWebpage(RightMoveProperty item)
 		{
 			var sInfo = new System.Diagnostics.ProcessStartInfo(item.Url)
 			{
@@ -206,19 +190,10 @@ namespace RightMoveApp.ViewModel
 			
 			RightMoveParser parser = new RightMoveParser(SearchParams);
 			await parser.SearchAsync();
-			/*
+
 			RightMoveList = parser.Results;
 
-			ObservableCollection<RightMoveProperty> propers = new ObservableCollection<RightMoveProperty>(parser.Results);
-			*/
-			
-			RightMoveList.Clear();
-
-			foreach (var res in parser.Results) 
-			{
-				RightMoveViewItem item = new RightMoveViewItem(res);
-				RightMoveList.Add(item);
-			}
+			Info = $"Average price: {parser.Results.AveragePrice.ToString("C2")}";
 			
 			IsNotSearching = true;
 		}
@@ -231,14 +206,6 @@ namespace RightMoveApp.ViewModel
 		private bool CanExecuteSearch(object parameter)
 		{
 			return true;
-		}
-
-		// This method is called by the Set accessor of each property.  
-		// The CallerMemberName attribute that is applied to the optional propertyName  
-		// parameter causes the property name of the caller to be substituted as an argument.  
-		private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 	}
 }

@@ -6,71 +6,114 @@
         xmlns:local="clr-namespace:RightMoveApp"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
 
-        xmlns:ViewModel="clr-namespace:RightMoveApp.ViewModel" x:Class="RightMoveApp.MainWindow"
+        x:Class="RightMoveApp.MainWindow"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:StyleAlias="clr-namespace:RightMove;assembly=RightMove"
         xmlns:controls="clr-namespace:RightMoveApp.UserControls"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="RightMove Scraper" Height="450" Width="800" Language="en-GB"
+        SizeToContent="Width"
+        HorizontalAlignment="Stretch"
         DataContext="{Binding Source={StaticResource Locator}, Path=MainViewModel}">
     <Window.Resources>
         <controls:FeatureConverter x:Key="FeatureConverter"/>
     </Window.Resources>
     <Grid>
-        <Grid.Resources>
-            <local:DebugDataBindingConverter x:Key="DebugBinding"/>
-        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="1*"/>
-        </Grid.RowDefinitions>
-        <GroupBox Grid.Column="0" Grid.Row="0" Header="Search Params" Panel.ZIndex="10">
-            <controls:SearchParamsControl x:Name="searchControl"
-                                          SearchParams="{Binding Path=SearchParams, Mode=TwoWay, diag:PresentationTraceSources.TraceLevel=High, Converter={StaticResource DebugBinding}}"
-                                          IsEnabled="{Binding Path=IsNotSearching}">
+        <Grid Grid.Column="0" Grid.Row="0">
+            <Grid.Resources>
+                <local:DebugDataBindingConverter x:Key="DebugBinding"/>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Column="0" Grid.Row="0" Header="Search Params" Panel.ZIndex="10">
+                <controls:SearchParamsControl x:Name="searchControl"
+                                              SearchParams="{Binding Path=SearchParams, Mode=TwoWay, diag:PresentationTraceSources.TraceLevel=High, Converter={StaticResource DebugBinding}}"
+                                              IsEnabled="{Binding Path=IsNotSearching}">
 
-            </controls:SearchParamsControl>
-        </GroupBox>
-        <ListView x:Name="listView" Grid.Column="0" Grid.Row="2" 
-                  ItemsSource="{Binding Path=RightMoveList}" 
-                  SelectedItem="{Binding Path=RightMoveSelectedItem}"
-                  GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseDoubleClick">
-                    <i:InvokeCommandAction Command="{Binding OpenLink}" 
-                                           CommandParameter="{Binding Path=RightMoveSelectedItem}" 
-                                           PassEventArgsToCommand="True" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Open Link" 
-                              Command="{Binding OpenLink}" 
-                              CommandParameter="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}" />
-                    <MenuItem Header="View Images" 
-                              Command="{Binding ViewImages}"
-                              CommandParameter="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}" />
-                </ContextMenu>
-            </ListView.ContextMenu>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="F" DisplayMemberBinding="{Binding Featured, Converter={StaticResource FeatureConverter} }"/>
-                    <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}"/>
-                    <GridViewColumn Header="RM Id" DisplayMemberBinding="{Binding RightMoveId}"/>
-                    <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Price, StringFormat={}{0:C0}.00}"/>
-                    <GridViewColumn Header="House Type" DisplayMemberBinding="{Binding HouseInfo}"/>
-                    <GridViewColumn Header="Address" DisplayMemberBinding="{Binding Address}"/>
-                    <GridViewColumn Header="Desc" DisplayMemberBinding="{Binding Desc}"/>
-                    <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}"/>
-                    <GridViewColumn Header="Agent" DisplayMemberBinding="{Binding Agent}"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
-        <Button x:Name="btnSearch" Grid.Column="0" Grid.Row="1" Content="Search" Command="{Binding SearchAsyncCommand}"/>
+                </controls:SearchParamsControl>
+            </GroupBox>
+            <Button x:Name="btnSearch" Grid.Column="0" Grid.Row="1" Content="Search" Command="{Binding SearchAsyncCommand}"/>
+            <ListView x:Name="listView" Grid.Column="0" Grid.Row="2" 
+                      ItemsSource="{Binding Path=RightMoveList}" 
+                      SelectedItem="{Binding Path=RightMoveSelectedItem}"
+                      GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction Command="{Binding OpenLink}" 
+                                               CommandParameter="{Binding Path=RightMoveSelectedItem}" 
+                                               PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Open Link" 
+                                  Command="{Binding OpenLink}" 
+                                  CommandParameter="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}" />
+                        <MenuItem Header="View Images" 
+                                  Command="{Binding ViewImages}"
+                                  CommandParameter="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}" />
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="F" DisplayMemberBinding="{Binding Featured, Converter={StaticResource FeatureConverter} }"/>
+                        <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}"/>
+                        <GridViewColumn Header="RM Id" DisplayMemberBinding="{Binding RightMoveId}"/>
+                        <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Price, StringFormat={}{0:C0}.00}"/>
+                        <GridViewColumn Header="House Type" DisplayMemberBinding="{Binding HouseInfo}"/>
+                        <GridViewColumn Header="Address" DisplayMemberBinding="{Binding Address}"/>
+                        <GridViewColumn Header="Desc" DisplayMemberBinding="{Binding Desc}"/>
+                        <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}"/>
+                        <GridViewColumn Header="Agent" DisplayMemberBinding="{Binding Agent}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <Label Grid.Column="0" Grid.Row="3" 
+                   Content="{Binding Path=Info}"/>
+            <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Grid.RowSpan="1" Grid.ColumnSpan="2" BorderBrush="Black" 
+                        BorderThickness="1,1,1,1" Background="{x:Null}" />
+                <Grid Grid.Column="0" Grid.Row="0">
+                    <Grid.Style>
+                        <Style TargetType="{x:Type Grid}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=ExpandButton, Path=IsChecked}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Image x:Name="img" Grid.Column="0" Grid.Row="0" Width="100"/>
+                </Grid>
+                <ToggleButton x:Name="ExpandButton" 
+                              Grid.Row="0"
+                              Grid.Column="1"
+                              Content=">" 
+                              Padding="10"/>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
