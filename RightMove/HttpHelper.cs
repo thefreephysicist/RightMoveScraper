@@ -32,33 +32,5 @@ namespace RightMove
 				return pic;
 			}
 		}
-		/*
-		public static void DownloadRemoteImageFile(string uri, string filename)
-		{
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-			// check remote file exists
-			if ((response.StatusCode == HttpStatusCode.OK ||
-			 response.StatusCode == HttpStatusCode.Moved ||
-			 response.StatusCode == HttpStatusCode.Redirect) &&
-				response.ContentType.StartsWith("image", StringComparison.OrdinalIgnoreCase))
-			{
-				// if the remote file was found, download oit
-				using (Stream inputStream = response.GetResponseStream())
-				{
-					byte[] buffer = new byte[4096];
-					int bytesRead;
-					do
-					{
-						bytesRead = inputStream.Read(buffer, 0, buffer.Length);
-					} while (bytesRead != 0);
-				}
-
-				Bitmap bitmap = new Bitmap(inputStream);
-
-			}
-		}
-		*/
 	}
 }

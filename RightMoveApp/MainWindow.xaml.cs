@@ -27,31 +27,34 @@ namespace RightMoveApp
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private readonly ISampleService sampleService;
-		private readonly AppSettings settings;
-		
-		public MainWindow(ISampleService sampleService,
-			IOptions<AppSettings> settings)
+		private GridViewColumnHeader _lastHeaderClicked;
+		private ListSortDirection _lastDirection = ListSortDirection.Ascending;
+
+		public MainWindow()
 		{
 			InitializeComponent();
-
-			this.sampleService = sampleService;
-			this.settings = settings.Value;
 		}
 
-		private GridViewColumnHeader lastHeaderClicked;
-		private ListSortDirection lastDirection = ListSortDirection.Ascending;
-
+		/// <summary>
+		/// Grid view column event handler clicked
+		/// </summary>
+		/// <param name="sender">the sender</param>
+		/// <param name="e">the event args</param>
 		private void GridViewColumnHeaderClickedHandler(object sender, RoutedEventArgs e)
 		{
 			if (!(e.OriginalSource is GridViewColumnHeader ch)) return;
 			var dir = ListSortDirection.Ascending;
-			if (ch == lastHeaderClicked && lastDirection == ListSortDirection.Ascending)
+			if (ch == _lastHeaderClicked && _lastDirection == ListSortDirection.Ascending)
 				dir = ListSortDirection.Descending;
 			Sort(ch, dir);
-			lastHeaderClicked = ch; lastDirection = dir;
+			_lastHeaderClicked = ch; _lastDirection = dir;
 		}
 
+		/// <summary>
+		/// Sort by column header
+		/// </summary>
+		/// <param name="ch">the column header</param>
+		/// <param name="dir">the sort direction</param>
 		private void Sort(GridViewColumnHeader ch, ListSortDirection dir)
 		{
 			var bn = (ch.Column.DisplayMemberBinding as Binding)?.Path.Path;

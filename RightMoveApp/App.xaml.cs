@@ -22,7 +22,7 @@ namespace RightMoveApp
 		private readonly IHost host;
 		public static IServiceProvider ServiceProvider { get; private set; }
 		
-		public static class Windows
+		public static class WindowKeys
 		{
 			public const string MainWindow = nameof(MainWindow);
 			public const string ImageWindow = nameof(ImageWindow);
@@ -45,13 +45,12 @@ namespace RightMoveApp
 		{
 			services.Configure<AppSettings>(configuration.GetSection(nameof(AppSettings)));
 			services.AddScoped<ISampleService, SampleService>();
-			services.AddScoped<IWindowService, WindowService>();
 
 			services.AddScoped<NavigationService>(serviceProvider =>
 			{
 				var navigationService = new NavigationService(serviceProvider);
-				navigationService.Configure(Windows.MainWindow, typeof(MainWindow));
-				navigationService.Configure(Windows.ImageWindow, typeof(ImageWindow));
+				navigationService.Configure(WindowKeys.MainWindow, typeof(MainWindow));
+				navigationService.Configure(WindowKeys.ImageWindow, typeof(ImageWindow));
 				return navigationService;
 			});
 			
@@ -67,19 +66,9 @@ namespace RightMoveApp
 
 		protected override async void OnStartup(StartupEventArgs e)
 		{
-			PresentationTraceSources.Refresh();
-			PresentationTraceSources.DataBindingSource.Listeners.Add(new ConsoleTraceListener());
-			PresentationTraceSources.DataBindingSource.Listeners.Add(new DebugTraceListener());
-			PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
-
 			await host.StartAsync();
-
-			/*
-			var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
-			mainWindow.Show();
-			*/
 			var navigationService = ServiceProvider.GetRequiredService<NavigationService>();
-			await navigationService.ShowAsync(Windows.MainWindow);
+			await navigationService.ShowAsync(WindowKeys.MainWindow);
 			
 			base.OnStartup(e);
 		}
@@ -92,18 +81,6 @@ namespace RightMoveApp
 			}
 
 			base.OnExit(e);
-		}
-	}
-
-	public class DebugTraceListener : TraceListener
-	{
-		public override void Write(string message)
-		{
-		}
-
-		public override void WriteLine(string message)
-		{
-			// Debugger.Break();
 		}
 	}
 }

@@ -16,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using GalaSoft.MvvmLight;
 using Microsoft.Extensions.Options;
+using RightMoveApp.Helpers;
 using RightMoveApp.Services;
 using RightMoveApp.UserControls;
 
@@ -23,26 +24,25 @@ namespace RightMoveApp.ViewModel
 {
 	public class MainViewModel : ViewModelBase
 	{
-		private readonly IWindowService _windowFactory;
 		private readonly NavigationService _navigationService;
-		private readonly ISampleService sampleService;
-		private readonly AppSettings settings;
+		private readonly ISampleService _sampleService;
+		private readonly AppSettings _settings;
+
+		private RightMoveSearchItemCollection _rightMoveList;
+		private string _info;
+
+		private int _selectedImageIndex;
+		private BitmapImage _displayedImage;
 
 		public MainViewModel(NavigationService navigationService,
 			ISampleService sampleService, 
-			IWindowService windowService,
 			IOptions<AppSettings> options)
 		{
 			_navigationService = navigationService;
-			this.sampleService = sampleService;
-			_windowFactory = windowService;
-			settings = options.Value;
+			_sampleService = sampleService;
+			_settings = options.Value;
 
-			SearchAsyncCommand = new AsyncRelayCommand(ExecuteSearch, CanExecuteSearch);
-			OpenLink = new RelayCommand(ExecuteOpenLink, CanExecuteOpenLink);
-			LoadImageWindow = new AsyncRelayCommand(ExecuteLoadImageWindowAsync, CanExecuteLoadImageWindow);
-			UpdateImages = new AsyncRelayCommand(ExecuteUpdateImagesAsync, CanExecuteUpdateImages);
-			SearchParams = new SearchParams();
+			InitializeCommands();
 
 			IsNotSearching = true;
 		}
@@ -53,32 +53,16 @@ namespace RightMoveApp.ViewModel
 			set;
 		}
 		
-		private string _info; 
-		
 		public string Info
 		{
-			get
-			{
-				return _info;
-			}
-			set
-			{
-				Set(ref _info, value);
-			}
+			get =>_info;
+			set => Set(ref _info, value);
 		}
-
-		private RightMoveSearchItemCollection _rightMoveList;
 
 		public RightMoveSearchItemCollection RightMoveList
 		{
-			get
-			{
-				return _rightMoveList;
-			}
-			set
-			{
-				Set(ref _rightMoveList, value);
-			}
+			get => _rightMoveList;
+			set => Set(ref _rightMoveList, value);
 		}
 		
 		/// <summary>
@@ -104,7 +88,15 @@ namespace RightMoveApp.ViewModel
 			get;
 			set;
 		}
-		
+
+		public BitmapImage DisplayedImage
+		{
+			get => _displayedImage;
+			set => Set(ref _displayedImage, value);
+		}
+
+		public bool IsNotSearching { get; set; }
+
 		#region Commands
 
 		/// <summary>
@@ -136,23 +128,14 @@ namespace RightMoveApp.ViewModel
 			get;
 			set;
 		}
-		
-		/// <summary>
-		/// Gets or sets the sort command
-		/// </summary>
-		public ICommand SortCommand
-		{
-			get;
-			set;
-		}
-
-		public bool IsNotSearching { get; set; }
 
 		#endregion
 
+		#region Command methods
+
 		private Task ExecuteLoadImageWindowAsync(object obj)
 		{
-			return _navigationService.ShowDialogAsync(App.Windows.ImageWindow, RightMoveSelectedItem.RightMoveId);
+			return _navigationService.ShowDialogAsync(App.WindowKeys.ImageWindow, RightMoveSelectedItem.RightMoveId);
 		}
 
 		private bool CanExecuteLoadImageWindow(object arg)
@@ -170,22 +153,6 @@ namespace RightMoveApp.ViewModel
 			await UpdateImage(RightMovePropertyFullSelectedItem);
 		}
 
-		/*
-		private async Task ExecuteUpdateImages(object arg)
-		{
-			System.Diagnostics.Debug.WriteLine(RightMoveSelectedItem.RightMoveId);
-			RightMovePropertyPageParser parser = new RightMovePropertyPageParser(RightMoveSelectedItem.RightMoveId);
-			await parser.ParseRightMovePropertyPageAsync();
-			RightMovePropertyFullSelectedItem = parser.RightMoveProperty;
-			_selectedImageIndex = 0;
-			await UpdateImage(RightMovePropertyFullSelectedItem);
-		}
-		*/
-		private bool CanExecuteUpdateImages(object arg)
-		{
-			return IsImagesVisible && RightMoveSelectedItem != null;
-		}
-
 		private async Task UpdateImage(RightMoveProperty rightMoveProperty)
 		{
 			byte[] imageArr = rightMoveProperty.GetImage(_selectedImageIndex);
@@ -194,37 +161,8 @@ namespace RightMoveApp.ViewModel
 				return;
 			}
 
-			var bitmapImage = ToImage(imageArr);
+			var bitmapImage = ImageHelper.ToImage(imageArr);
 			DisplayedImage = bitmapImage;
-		}
-
-		private BitmapImage ToImage(byte[] array)
-		{
-			using (var ms = new System.IO.MemoryStream(array))
-			{
-				var image = new BitmapImage();
-				image.BeginInit();
-				image.CacheOption = BitmapCacheOption.OnLoad; // here
-				image.StreamSource = ms;
-				image.EndInit();
-				return image;
-			}
-		}
-
-		private int _selectedImageIndex;
-		
-		private BitmapImage _displayedImage;
-
-		public BitmapImage DisplayedImage
-		{
-			get
-			{
-				return _displayedImage;
-			}
-			set
-			{
-				Set(ref _displayedImage, value);
-			}
 		}
 
 		/// <summary>
@@ -238,21 +176,7 @@ namespace RightMoveApp.ViewModel
 				return;
 			}
 
-			OpenWebpage(RightMoveSelectedItem);
-		}
-
-		/// <summary>
-		/// Open a webpage for the <see cref="RightMoveViewItem"/>
-		/// </summary>
-		/// <param name="item">The <see cref="RightMoveViewItem"/></param>
-		private void OpenWebpage(RightMoveProperty item)
-		{
-			var sInfo = new System.Diagnostics.ProcessStartInfo(item.Url)
-			{
-				UseShellExecute = true,
-			};
-
-			System.Diagnostics.Process.Start(sInfo);
+			BrowserHelper.OpenWebpage(RightMoveSelectedItem.Url);
 		}
 
 		/// <summary>
@@ -264,7 +188,7 @@ namespace RightMoveApp.ViewModel
 		{
 			return true;
 		}
-		
+
 		/// <summary>
 		/// The execute search command
 		/// </summary>
@@ -272,25 +196,49 @@ namespace RightMoveApp.ViewModel
 		private async Task ExecuteSearch(object parameter)
 		{
 			IsNotSearching = false;
-			
+
 			RightMoveParser parser = new RightMoveParser(SearchParams);
 			await parser.SearchAsync();
 
 			RightMoveList = parser.Results;
 
 			Info = $"Average price: {parser.Results.AveragePrice.ToString("C2")}";
-			
+
 			IsNotSearching = true;
 		}
 
 		/// <summary>
-		/// THe can execute search command
+		/// The can execute search command
 		/// </summary>
 		/// <param name="parameter">the parameter</param>
-		/// <returns></returns>
+		/// <returns>true if can execute, false otherwise</returns>
 		private bool CanExecuteSearch(object parameter)
 		{
 			return true;
+		}
+
+		/// <summary>
+		/// Can execute update images
+		/// </summary>
+		/// <param name="arg">the argument</param>
+		/// <returns>true if can execute, false otherwise</returns>
+		private bool CanExecuteUpdateImages(object arg)
+		{
+			return IsImagesVisible && RightMoveSelectedItem != null;
+		}
+
+		#endregion
+		
+		/// <summary>
+		/// Initialize a bunch of <see cref="ICommand"/>
+		/// </summary>
+		private void InitializeCommands()
+		{
+			SearchAsyncCommand = new AsyncRelayCommand(ExecuteSearch, CanExecuteSearch);
+			OpenLink = new RelayCommand(ExecuteOpenLink, CanExecuteOpenLink);
+			LoadImageWindow = new AsyncRelayCommand(ExecuteLoadImageWindowAsync, CanExecuteLoadImageWindow);
+			UpdateImages = new AsyncRelayCommand(ExecuteUpdateImagesAsync, CanExecuteUpdateImages);
+			SearchParams = new SearchParams();
 		}
 	}
 }

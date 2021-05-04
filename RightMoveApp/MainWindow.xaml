@@ -4,11 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RightMoveApp"
-        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
 
         x:Class="RightMoveApp.MainWindow"
-        xmlns:System="clr-namespace:System;assembly=mscorlib"
-        xmlns:StyleAlias="clr-namespace:RightMove;assembly=RightMove"
         xmlns:controls="clr-namespace:RightMoveApp.UserControls"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
@@ -17,17 +14,12 @@
         HorizontalAlignment="Stretch"
         DataContext="{Binding Source={StaticResource Locator}, Path=MainViewModel}">
     <Window.Resources>
-        <controls:FeatureConverter x:Key="FeatureConverter"/>
-        <!--<BooleanToVisibilityConverter x:Key="IsImagesVisible"/>-->
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
         <Grid>
-            <Grid.Resources>
-                <local:DebugDataBindingConverter x:Key="DebugBinding"/>
-            </Grid.Resources>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -40,7 +32,7 @@
             </Grid.RowDefinitions>
             <GroupBox Grid.Column="0" Grid.Row="0" Header="Search Params" Panel.ZIndex="10">
                 <controls:SearchParamsControl x:Name="searchControl"
-                                              SearchParams="{Binding Path=SearchParams, Mode=TwoWay, diag:PresentationTraceSources.TraceLevel=High, Converter={StaticResource DebugBinding}}"
+                                              SearchParams="{Binding Path=SearchParams, Mode=TwoWay}"
                                               IsEnabled="{Binding Path=IsNotSearching}">
 
                 </controls:SearchParamsControl>
