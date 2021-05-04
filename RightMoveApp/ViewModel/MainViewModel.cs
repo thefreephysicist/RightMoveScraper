@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using GalaSoft.MvvmLight;
 using Microsoft.Extensions.Options;
 using RightMoveApp.Services;
@@ -37,16 +38,21 @@ namespace RightMoveApp.ViewModel
 			_windowFactory = windowService;
 			settings = options.Value;
 
-			// RightMoveList = new RightMoveSearchItemCollection();
-
 			SearchAsyncCommand = new AsyncRelayCommand(ExecuteSearch, CanExecuteSearch);
 			OpenLink = new RelayCommand(ExecuteOpenLink, CanExecuteOpenLink);
-			ViewImages = new AsyncRelayCommand(ExecuteViewImagesAsync, CanExecuteViewImages);
+			LoadImageWindow = new AsyncRelayCommand(ExecuteLoadImageWindowAsync, CanExecuteLoadImageWindow);
+			UpdateImages = new AsyncRelayCommand(ExecuteUpdateImagesAsync, CanExecuteUpdateImages);
 			SearchParams = new SearchParams();
 
 			IsNotSearching = true;
 		}
 
+		public bool IsImagesVisible
+		{
+			get;
+			set;
+		}
+		
 		private string _info; 
 		
 		public string Info
@@ -84,6 +90,12 @@ namespace RightMoveApp.ViewModel
 			set;
 		}
 
+		public RightMoveProperty RightMovePropertyFullSelectedItem
+		{
+			get;
+			set;
+		}
+
 		/// <summary>
 		/// Gets or sets the <see cref="SearchParams"/>
 		/// </summary>
@@ -113,7 +125,13 @@ namespace RightMoveApp.ViewModel
 			set;
 		}
 
-		public ICommand ViewImages
+		public ICommand LoadImageWindow
+		{
+			get;
+			set;
+		}
+		
+		public ICommand UpdateImages
 		{
 			get;
 			set;
@@ -132,16 +150,83 @@ namespace RightMoveApp.ViewModel
 
 		#endregion
 
-		private Task ExecuteViewImagesAsync(object obj)
+		private Task ExecuteLoadImageWindowAsync(object obj)
 		{
 			return _navigationService.ShowDialogAsync(App.Windows.ImageWindow, RightMoveSelectedItem.RightMoveId);
 		}
 
-		private bool CanExecuteViewImages(object arg)
+		private bool CanExecuteLoadImageWindow(object arg)
 		{
 			return RightMoveSelectedItem != null;
 		}
+
+		private async Task ExecuteUpdateImagesAsync(object arg)
+		{
+			System.Diagnostics.Debug.WriteLine(RightMoveSelectedItem.RightMoveId);
+			RightMovePropertyPageParser parser = new RightMovePropertyPageParser(RightMoveSelectedItem.RightMoveId);
+			await parser.ParseRightMovePropertyPageAsync();
+			RightMovePropertyFullSelectedItem = parser.RightMoveProperty;
+			_selectedImageIndex = 0;
+			await UpdateImage(RightMovePropertyFullSelectedItem);
+		}
+
+		/*
+		private async Task ExecuteUpdateImages(object arg)
+		{
+			System.Diagnostics.Debug.WriteLine(RightMoveSelectedItem.RightMoveId);
+			RightMovePropertyPageParser parser = new RightMovePropertyPageParser(RightMoveSelectedItem.RightMoveId);
+			await parser.ParseRightMovePropertyPageAsync();
+			RightMovePropertyFullSelectedItem = parser.RightMoveProperty;
+			_selectedImageIndex = 0;
+			await UpdateImage(RightMovePropertyFullSelectedItem);
+		}
+		*/
+		private bool CanExecuteUpdateImages(object arg)
+		{
+			return IsImagesVisible && RightMoveSelectedItem != null;
+		}
+
+		private async Task UpdateImage(RightMoveProperty rightMoveProperty)
+		{
+			byte[] imageArr = rightMoveProperty.GetImage(_selectedImageIndex);
+			if (imageArr is null)
+			{
+				return;
+			}
+
+			var bitmapImage = ToImage(imageArr);
+			DisplayedImage = bitmapImage;
+		}
+
+		private BitmapImage ToImage(byte[] array)
+		{
+			using (var ms = new System.IO.MemoryStream(array))
+			{
+				var image = new BitmapImage();
+				image.BeginInit();
+				image.CacheOption = BitmapCacheOption.OnLoad; // here
+				image.StreamSource = ms;
+				image.EndInit();
+				return image;
+			}
+		}
+
+		private int _selectedImageIndex;
 		
+		private BitmapImage _displayedImage;
+
+		public BitmapImage DisplayedImage
+		{
+			get
+			{
+				return _displayedImage;
+			}
+			set
+			{
+				Set(ref _displayedImage, value);
+			}
+		}
+
 		/// <summary>
 		/// Execute open link command
 		/// </summary>

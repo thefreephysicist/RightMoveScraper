@@ -18,17 +18,18 @@
         DataContext="{Binding Source={StaticResource Locator}, Path=MainViewModel}">
     <Window.Resources>
         <controls:FeatureConverter x:Key="FeatureConverter"/>
+        <!--<BooleanToVisibilityConverter x:Key="IsImagesVisible"/>-->
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" Grid.Row="0">
+        <Grid>
             <Grid.Resources>
                 <local:DebugDataBindingConverter x:Key="DebugBinding"/>
             </Grid.Resources>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -47,13 +48,17 @@
             <Button x:Name="btnSearch" Grid.Column="0" Grid.Row="1" Content="Search" Command="{Binding SearchAsyncCommand}"/>
             <ListView x:Name="listView" Grid.Column="0" Grid.Row="2" 
                       ItemsSource="{Binding Path=RightMoveList}" 
-                      SelectedItem="{Binding Path=RightMoveSelectedItem}"
+                      SelectedItem="{Binding Path=RightMoveSelectedItem, Delay=500}"
                       GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDoubleClick">
                         <i:InvokeCommandAction Command="{Binding OpenLink}" 
                                                CommandParameter="{Binding Path=RightMoveSelectedItem}" 
                                                PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding UpdateImages}"
+                                               CommandParameter="{Binding Path=RightMoveSelectedItem}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <ListView.ContextMenu>
@@ -62,13 +67,12 @@
                                   Command="{Binding OpenLink}" 
                                   CommandParameter="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}" />
                         <MenuItem Header="View Images" 
-                                  Command="{Binding ViewImages}"
+                                  Command="{Binding LoadImageWindow}"
                                   CommandParameter="{Binding Path=PlacementTarget, RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}" />
                     </ContextMenu>
                 </ListView.ContextMenu>
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="F" DisplayMemberBinding="{Binding Featured, Converter={StaticResource FeatureConverter} }"/>
                         <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}"/>
                         <GridViewColumn Header="RM Id" DisplayMemberBinding="{Binding RightMoveId}"/>
                         <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Price, StringFormat={}{0:C0}.00}"/>
@@ -106,13 +110,14 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*"/>
                     </Grid.RowDefinitions>
-                    <Image x:Name="img" Grid.Column="0" Grid.Row="0" Width="100"/>
+                    <Image x:Name="img" Grid.Column="0" Grid.Row="0" Width="400" Source="{Binding DisplayedImage}"/>
                 </Grid>
                 <ToggleButton x:Name="ExpandButton" 
                               Grid.Row="0"
                               Grid.Column="1"
                               Content=">" 
-                              Padding="10"/>
+                              Padding="10"
+                              IsChecked="{Binding IsImagesVisible}"/>
             </Grid>
         </Grid>
     </Grid>

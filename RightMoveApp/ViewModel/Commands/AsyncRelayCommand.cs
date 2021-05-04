@@ -34,7 +34,9 @@ namespace RightMoveApp.ViewModel.Commands
 		public bool CanExecute(object parameter)
 		{
 			if (Interlocked.Read(ref isExecuting) != 0)
+			{
 				return false;
+			}
 
 			return canExecute(parameter);
 		}
