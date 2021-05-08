@@ -16,23 +16,18 @@ namespace RightMoveApp.ViewModel
 	public class MainViewModel : ViewModelBase
 	{
 		private readonly NavigationService _navigationService;
-		private readonly ISampleService _sampleService;
-		private readonly AppSettings _settings;
 
 		private RightMoveSearchItemCollection _rightMoveList;
 		private string _info;
 
 		private int _selectedImageIndex;
 		private BitmapImage _displayedImage;
+		private RightMoveProperty _rightMovePropertyFullSelectedItem;
+		CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
-		public MainViewModel(NavigationService navigationService,
-			ISampleService sampleService, 
-			IOptions<AppSettings> options)
+		public MainViewModel(NavigationService navigationService)
 		{
 			_navigationService = navigationService;
-			_sampleService = sampleService;
-			_settings = options.Value;
-
 			InitializeCommands();
 
 			IsNotSearching = true;
@@ -65,15 +60,12 @@ namespace RightMoveApp.ViewModel
 			set;
 		}
 
-		private RightMoveProperty _rightMovePropertyFullSelectedItem;
-		
 		public RightMoveProperty RightMovePropertyFullSelectedItem
 		{
 			get => _rightMovePropertyFullSelectedItem;
 			set
 			{
 				Set(ref _rightMovePropertyFullSelectedItem, value);
-				// UpdateImages.RaiseCanExecuteChanged();
 				PrevImageCommand.RaiseCanExecuteChanged();
 				NextImageCommand.RaiseCanExecuteChanged();
 			}
@@ -88,12 +80,18 @@ namespace RightMoveApp.ViewModel
 			set;
 		}
 
+		/// <summary>
+		/// Gets or sets the displayed image
+		/// </summary>
 		public BitmapImage DisplayedImage
 		{
 			get => _displayedImage;
 			set => Set(ref _displayedImage, value);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether searching is occuring
+		/// </summary>
 		public bool IsNotSearching { get; set; }
 
 		#region Commands
@@ -122,6 +120,7 @@ namespace RightMoveApp.ViewModel
 			set;
 		}
 		
+		// Tried to get this AsyncCommand to work but it wouldn't
 		/*
 		public AsyncCommand<object> UpdateImages
 		{
@@ -129,14 +128,24 @@ namespace RightMoveApp.ViewModel
 			set;
 		}
 		*/
+		
+		/// <summary>
+		/// Update images command
+		/// </summary>
 		public CommandAsync<object> UpdateImages { get; set; }
 
+		/// <summary>
+		/// Gets or sets the NextImageCommand
+		/// </summary>
 		public AsyncCommand<object> NextImageCommand
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Gets or sets the PrevImageCommand
+		/// </summary>
 		public AsyncCommand<object> PrevImageCommand
 		{
 			get;
@@ -147,21 +156,30 @@ namespace RightMoveApp.ViewModel
 
 		#region Command methods
 
+		/// <summary>
+		/// Show image window
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns>Task to load image window</returns>
 		private Task ExecuteLoadImageWindowAsync(object obj)
 		{
 			return _navigationService.ShowDialogAsync(App.WindowKeys.ImageWindow, RightMoveSelectedItem.RightMoveId);
 		}
 
+		/// <summary>
+		/// Can execute load image window
+		/// </summary>
+		/// <param name="arg"></param>
+		/// <returns></returns>
 		private bool CanExecuteLoadImageWindow(object arg)
 		{
 			return RightMoveSelectedItem != null;
 		}
 
-		private Task UpdateImageTask;
-
 		private async Task ExecuteUpdateImagesNewAsync(object arg, CancellationToken cancellationToken)
 		{
 			System.Diagnostics.Debug.WriteLine(RightMoveSelectedItem.RightMoveId);
+			
 			await UpdateRightMovePropertyFullSelectedItem(cancellationToken);
 			var updateImageTask = UpdateImage(_selectedImageIndex, cancellationToken);
 			
@@ -180,31 +198,20 @@ namespace RightMoveApp.ViewModel
 			}
 		}
 
-		CancellationTokenSource _tokenSource = new CancellationTokenSource();
-		bool _locked = false;
-
 		private async Task TempTask(CancellationToken cancellationToken)
 		{
 			await UpdateRightMovePropertyFullSelectedItem(cancellationToken);
-			// await UpdateImage(_selectedImageIndex, cancellationToken);
+			await UpdateImage(_selectedImageIndex, cancellationToken);
 		}
 
 		private async Task ExecuteUpdateImagesAsync(object arg)
 		{
 			System.Diagnostics.Debug.WriteLine(RightMoveSelectedItem.RightMoveId);
-
-			bool _isRunning = true;
-			bool _lock = false;
 			System.Diagnostics.Debug.WriteLine("Started running");
 			try
 			{
-				if (_lock)
-				{
-					_tokenSource.Cancel();
-					_tokenSource = new CancellationTokenSource();
-				}
-
-				_lock = true;
+				_tokenSource.Cancel();
+				_tokenSource = new CancellationTokenSource();
 
 				CancellationToken cancellationToken = _tokenSource.Token;
 				// Task t = TempTask(cancellationToken);
@@ -218,61 +225,9 @@ namespace RightMoveApp.ViewModel
 			}
 			finally
 			{
-				_isRunning = false;
 				// dispose of token if I ever figure it out!
 				System.Diagnostics.Debug.WriteLine("Finished running");
-				_lock = false;
 			}
-
-			/*
-			try
-			{
-				await t;
-				// _locked = true;
-				// await UpdateRightMovePropertyFullSelectedItem(cancellationToken);
-				// var updateImageTask = UpdateImage(_selectedImageIndex, cancellationToken);
-			}
-			catch (TaskCanceledException)
-			{
-				System.Diagnostics.Debug.WriteLine("Cancelled");
-			}
-			finally
-			{
-				_locked = false;
-				// _tokenSource.Dispose();
-			}
-			*/
-			/*
-			System.Diagnostics.Debug.WriteLine(RightMoveSelectedItem.RightMoveId);
-			var rightMoveItem = (RightMoveProperty) RightMoveSelectedItem;
-			System.Diagnostics.Debug.WriteLine(rightMoveItem.RightMoveId);
-			// var updateImageTask = UpdateImage();
-			CancellationTokenSource CancellationSourceToken = new CancellationTokenSource();
-
-			// Task.Factory.StartNew(() => updateImageTask, CancellationSourceToken.Token);
-			
-			Task t = Task.Run(() =>
-			{
-				RightMovePropertyPageParser parser = new RightMovePropertyPageParser(RightMoveSelectedItem.RightMoveId);
-				parser.ParseRightMovePropertyPageAsync().GetAwaiter().GetResult();
-				RightMovePropertyFullSelectedItem = parser.RightMoveProperty;
-				_selectedImageIndex = 0;
-				// UpdateImage(RightMovePropertyFullSelectedItem).GetAwaiter().GetResult();
-			}, CancellationSourceToken.Token);
-
-			try
-			{
-				await t;
-			}
-			catch (OperationCanceledException e)
-			{
-				Console.WriteLine($"{nameof(OperationCanceledException)} thrown with message: {e.Message}");
-			}
-			finally
-			{
-				// CancellationSourceToken.Dispose();
-			}
-			*/
 		}
 
 		private async Task ExecuteUpdateImagesAsync(object arg, CancellationToken cancellationToken)
@@ -423,7 +378,6 @@ namespace RightMoveApp.ViewModel
 			SearchAsyncCommand = new AsyncRelayCommandOld(ExecuteSearch, CanExecuteSearch);
 			OpenLink = new RelayCommand(ExecuteOpenLink, CanExecuteOpenLink);
 			LoadImageWindow = new AsyncRelayCommand(ExecuteLoadImageWindowAsync, CanExecuteLoadImageWindow);
-			// UpdateImages = new AsyncRelayCommand(ExecuteUpdateImagesAsync, CanExecuteUpdateImages);
 			SearchParams = new SearchParams();
 			// UpdateImages = new CommandAsync<object>(ExecuteUpdateImagesNewAsync, CanExecuteUpdateImages);
 			// UpdateImages = new AsyncCommand<object>(ExecuteUpdateImagesAsync, CanExecuteUpdateImages);
@@ -437,7 +391,7 @@ namespace RightMoveApp.ViewModel
 			return RightMovePropertyFullSelectedItem != null && _selectedImageIndex != RightMovePropertyFullSelectedItem.ImageUrl.Length - 1;
 		}
 
-		private async Task ExecuteUpdateNextImageAsync(object arg1) //, CancellationToken cancellationToken)
+		private async Task ExecuteUpdateNextImageAsync(object arg1)
 		{
 			_selectedImageIndex++;
 			CancellationTokenSource tokenSource = new CancellationTokenSource();
@@ -455,7 +409,7 @@ namespace RightMoveApp.ViewModel
 			return _selectedImageIndex > 0;
 		}
 
-		private async Task ExecuteUpdatePrevImageAsync(object arg1) //, CancellationToken cancellationToken)
+		private async Task ExecuteUpdatePrevImageAsync(object arg1)
 		{
 			_selectedImageIndex--;
 			CancellationTokenSource tokenSource = new CancellationTokenSource();
