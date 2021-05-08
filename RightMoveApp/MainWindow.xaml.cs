@@ -42,12 +42,16 @@ namespace RightMoveApp
 		/// <param name="e">the event args</param>
 		private void GridViewColumnHeaderClickedHandler(object sender, RoutedEventArgs e)
 		{
-			if (!(e.OriginalSource is GridViewColumnHeader ch)) return;
+			if (!(e.OriginalSource is GridViewColumnHeader gridViewColumnHeader)) return;
 			var dir = ListSortDirection.Ascending;
-			if (ch == _lastHeaderClicked && _lastDirection == ListSortDirection.Ascending)
+			if (gridViewColumnHeader == _lastHeaderClicked && _lastDirection == ListSortDirection.Ascending)
+			{
 				dir = ListSortDirection.Descending;
-			Sort(ch, dir);
-			_lastHeaderClicked = ch; _lastDirection = dir;
+			}
+
+			Sort(gridViewColumnHeader, dir);
+			_lastHeaderClicked = gridViewColumnHeader; 
+			_lastDirection = dir;
 		}
 
 		/// <summary>
@@ -57,13 +61,18 @@ namespace RightMoveApp
 		/// <param name="dir">the sort direction</param>
 		private void Sort(GridViewColumnHeader ch, ListSortDirection dir)
 		{
-			var bn = (ch.Column.DisplayMemberBinding as Binding)?.Path.Path;
-			bn = bn ?? ch.Column.Header as string;
-			var dv = CollectionViewSource.GetDefaultView(listView.ItemsSource);
-			dv.SortDescriptions.Clear();
-			var sd = new SortDescription(bn, dir);
-			dv.SortDescriptions.Add(sd);
-			dv.Refresh();
+			var bindingPath = (ch.Column.DisplayMemberBinding as Binding)?.Path.Path;
+			bindingPath ??= ch.Column.Header as string;
+			var collectionView = CollectionViewSource.GetDefaultView(listView.ItemsSource);
+			if (collectionView is null)
+			{
+				return;
+			}
+			
+			collectionView.SortDescriptions.Clear();
+			var sd = new SortDescription(bindingPath, dir);
+			collectionView.SortDescriptions.Add(sd);
+			collectionView.Refresh();
 		}
 	}
 }

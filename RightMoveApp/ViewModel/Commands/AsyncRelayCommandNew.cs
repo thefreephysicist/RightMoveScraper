@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace RightMoveApp.ViewModel.Commands
 {
-    public class AsyncRelayCommand : IAsyncRelayCommand
+    public class AsyncRelayCommandNew : IAsyncRelayCommand
     {
         public bool IsExecuting => this.executionCount > 0;
 
@@ -15,11 +15,12 @@ namespace RightMoveApp.ViewModel.Commands
         protected readonly Action ExecuteNoParam;
         protected readonly Func<bool> CanExecuteNoParam;
 
-        private readonly Func<object, Task> executeAsync;
+        private readonly Func<object, CancellationTokenSource, Task> _executeAsync;
         private readonly Action<object> execute;
         private readonly Predicate<object> canExecute;
         private EventHandler canExecuteChangedDelegate;
         private int executionCount;
+        private CancellationTokenSource _cancellationTokenSource;
 
         public event EventHandler CanExecuteChanged
         {
@@ -37,49 +38,52 @@ namespace RightMoveApp.ViewModel.Commands
 
         #region Constructors
 
-        public AsyncRelayCommand(Action<object> execute)
+        public AsyncRelayCommandNew(Action<object> execute)
           : this(execute, param => true)
         {
         }
 
-        public AsyncRelayCommand(Action executeNoParam)
+        public AsyncRelayCommandNew(Action executeNoParam)
           : this(executeNoParam, () => true)
         {
         }
 
-        public AsyncRelayCommand(Func<object, Task> executeAsync)
+        public AsyncRelayCommandNew(Func<object, CancellationTokenSource, Task> executeAsync)
           : this(executeAsync, param => true)
         {
         }
 
-        public AsyncRelayCommand(Func<Task> executeAsyncNoParam)
+        public AsyncRelayCommandNew(Func<Task> executeAsyncNoParam)
           : this(executeAsyncNoParam, () => true)
         {
         }
 
-        public AsyncRelayCommand(Action executeNoParam, Func<bool> canExecuteNoParam)
+        public AsyncRelayCommandNew(Action executeNoParam, Func<bool> canExecuteNoParam)
         {
             this.ExecuteNoParam = executeNoParam ?? throw new ArgumentNullException(nameof(executeNoParam));
             this.CanExecuteNoParam = canExecuteNoParam ?? (() => true);
         }
 
-        public AsyncRelayCommand(Action<object> execute, Predicate<object> canExecute)
+        public AsyncRelayCommandNew(Action<object> execute, Predicate<object> canExecute)
         {
             this.execute = execute ?? throw new ArgumentNullException(nameof(execute));
             this.canExecute = canExecute ?? (param => true); ;
         }
 
-        public AsyncRelayCommand(Func<Task> executeAsyncNoParam, Func<bool> canExecuteNoParam)
+        public AsyncRelayCommandNew(Func<Task> executeAsyncNoParam, Func<bool> canExecuteNoParam)
         {
             this.ExecuteAsyncNoParam = executeAsyncNoParam ?? throw new ArgumentNullException(nameof(executeAsyncNoParam));
             this.CanExecuteNoParam = canExecuteNoParam ?? (() => true);
         }
 
-        public AsyncRelayCommand(Func<object, Task> executeAsync, Predicate<object> canExecute)
+        public AsyncRelayCommandNew(Func<object, CancellationTokenSource, Task> executeAsync, Predicate<object> canExecute)
         {
-            this.executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
-            this.canExecute = canExecute ?? (param => true); ;
+	        _cancellationTokenSource = new CancellationTokenSource();
+
+            this._executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
+            this.canExecute = canExecute ?? (param => true);
         }
+        
 
         #endregion Constructors
 
@@ -105,14 +109,14 @@ namespace RightMoveApp.ViewModel.Commands
                 Interlocked.Increment(ref this.executionCount);
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (this.executeAsync != null)
+                if (_executeAsync != null)
                 {
-                    await this.executeAsync.Invoke(parameter).ConfigureAwait(false);
+                    // await _executeAsync.Invoke(parameter, cancellationToken).ConfigureAwait(false);
                     return;
                 }
-                if (this.ExecuteAsyncNoParam != null)
+                if (ExecuteAsyncNoParam != null)
                 {
-                    await this.ExecuteAsyncNoParam.Invoke().ConfigureAwait(false);
+                    await ExecuteAsyncNoParam.Invoke().ConfigureAwait(false);
                     return;
                 }
                 if (this.ExecuteNoParam != null)

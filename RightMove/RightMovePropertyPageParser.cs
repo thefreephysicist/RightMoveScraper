@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using AngleSharp.Dom;
 using Newtonsoft.Json;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RightMove
 {
@@ -41,19 +38,24 @@ namespace RightMove
 			private set;
 		}
 
-		public async Task<bool> ParseRightMovePropertyPageAsync()
+		public async Task<bool> ParseRightMovePropertyPageAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
-			return await ParseRightMovePropertyPageAsync(PropertyId);
+			return await ParseRightMovePropertyPageAsync(PropertyId, cancellationToken);
 		}
-		
-		private async Task<bool> ParseRightMovePropertyPageAsync(int propertyId)
+
+		private async Task<bool> ParseRightMovePropertyPageAsync(int propertyId, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			string url = RightMoveUrls.GetPropertyUrl(propertyId);
-			var document = await HttpHelper.GetDocument(url);
+			IDocument document = await HttpHelper.GetDocument(url, cancellationToken);
 
 			if (document is null)
 			{
 				return false;
+			}
+
+			if (cancellationToken.IsCancellationRequested)
+			{
+				cancellationToken.ThrowIfCancellationRequested();
 			}
 			
 			ParseRightMovePropertyPage(document);

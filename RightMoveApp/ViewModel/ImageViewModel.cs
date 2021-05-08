@@ -19,8 +19,8 @@ namespace RightMoveApp.ViewModel
 		
 		public ImageViewModel()
 		{
-			NextImageAsyncCommand = new AsyncRelayCommand(ExecuteNextImage, CanExecuteNextImage);
-			PrevImageAsyncCommand = new AsyncRelayCommand(ExecutePrevImage, CanExecutePrevImage);
+			NextImageAsyncCommand = new AsyncRelayCommandOld(ExecuteNextImage, CanExecuteNextImage);
+			PrevImageAsyncCommand = new AsyncRelayCommandOld(ExecutePrevImage, CanExecutePrevImage);
 		}
 
 		private bool CanExecutePrevImage(object arg)

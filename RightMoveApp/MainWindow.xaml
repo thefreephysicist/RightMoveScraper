@@ -40,7 +40,7 @@
             <Button x:Name="btnSearch" Grid.Column="0" Grid.Row="1" Content="Search" Command="{Binding SearchAsyncCommand}"/>
             <ListView x:Name="listView" Grid.Column="0" Grid.Row="2" 
                       ItemsSource="{Binding Path=RightMoveList}" 
-                      SelectedItem="{Binding Path=RightMoveSelectedItem, Delay=500}"
+                      SelectedItem="{Binding Path=RightMoveSelectedItem}"
                       GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDoubleClick">
@@ -70,7 +70,7 @@
                         <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Price, StringFormat={}{0:C0}.00}"/>
                         <GridViewColumn Header="House Type" DisplayMemberBinding="{Binding HouseInfo}"/>
                         <GridViewColumn Header="Address" DisplayMemberBinding="{Binding Address}"/>
-                        <GridViewColumn Header="Desc" DisplayMemberBinding="{Binding Desc}"/>
+                        <GridViewColumn Header="Desc" DisplayMemberBinding="{Binding Desc}" Width="200"/>
                         <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}"/>
                         <GridViewColumn Header="Agent" DisplayMemberBinding="{Binding Agent}"/>
                     </GridView>
@@ -101,8 +101,21 @@
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Image x:Name="img" Grid.Column="0" Grid.Row="0" Width="400" Source="{Binding DisplayedImage}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="btnLeft" 
+                                Content="&lt;" 
+                                Padding="10"
+                                Command="{Binding PrevImageCommand}"
+                                CommandParameter="{Binding RightMovePropertyFullSelectedItem}"/>
+                        <Button x:Name="btnRight"
+                                Content=">" 
+                                Command="{Binding NextImageCommand}"
+                                CommandParameter="{Binding RightMovePropertyFullSelectedItem}"
+                                Padding="10"/>
+                    </StackPanel>
                 </Grid>
                 <ToggleButton x:Name="ExpandButton" 
                               Grid.Row="0"
