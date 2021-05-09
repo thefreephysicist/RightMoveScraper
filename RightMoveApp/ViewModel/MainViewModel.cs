@@ -2,6 +2,7 @@
 using RightMoveApp.Model;
 using RightMoveApp.ViewModel.Commands;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -368,7 +369,8 @@ namespace RightMoveApp.ViewModel
 			await parser.SearchAsync();
 
 			RightMoveList = parser.Results;
-
+			_dbService.SaveProperties(RightMoveList.ToList());
+			
 			Info = $"Average price: {parser.Results.AveragePrice.ToString("C2")}";
 
 			IsNotSearching = true;
