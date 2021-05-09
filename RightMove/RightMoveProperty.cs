@@ -151,7 +151,7 @@ namespace RightMove
 				return null;
 			}
 			
-			return HttpHelper.DownloadRemoveImage(ImageUrl[index]);
+			return HttpHelper.DownloadImage(ImageUrl[index]);
 		}
 		
 		public override string ToString()

@@ -45,7 +45,8 @@ namespace RightMoveApp
 		{
 			services.Configure<AppSettings>(configuration.GetSection(nameof(AppSettings)));
 			services.AddScoped<ISampleService, SampleService>();
-
+			services.AddScoped<IDatabaseService, DatabaseService>();
+			
 			services.AddScoped<NavigationService>(serviceProvider =>
 			{
 				var navigationService = new NavigationService(serviceProvider);

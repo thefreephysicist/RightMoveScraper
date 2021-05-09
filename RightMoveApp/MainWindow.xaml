@@ -42,6 +42,12 @@
                       ItemsSource="{Binding Path=RightMoveList}" 
                       SelectedItem="{Binding Path=RightMoveSelectedItem}"
                       GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
+                <ListView.InputBindings>
+                    <KeyBinding Key="Right"
+                                Command="{Binding NextImageCommand}"/>
+                    <KeyBinding Key="Left"
+                                Command="{Binding PrevImageCommand}"/>
+                </ListView.InputBindings>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDoubleClick">
                         <i:InvokeCommandAction Command="{Binding OpenLink}" 
@@ -49,7 +55,7 @@
                                                PassEventArgsToCommand="True" />
                     </i:EventTrigger>
                     <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding UpdateImages}"
+                        <i:InvokeCommandAction Command="{Binding UpdateImages, Delay=3000}"
                                                CommandParameter="{Binding Path=RightMoveSelectedItem}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>

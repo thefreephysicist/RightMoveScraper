@@ -1,39 +1,24 @@
-﻿using System;
+﻿using RightMoveApp.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using RightMoveApp.Utilities;
 
 namespace RightMoveApp.ViewModel.Commands
 {
-	public interface IAsyncCommand : ICommand
-	{
-		Task ExecuteAsync();
-		bool CanExecute();
-	}
-
-	public interface IAsyncCommand<T> : ICommand
-	{
-		Task ExecuteAsync(T parameter);
-		bool CanExecute(T parameter);
-	}
-
 	public class AsyncCommand : IAsyncCommand
 	{
-		// public event EventHandler CanExecuteChanged;
-		public event EventHandler CanExecuteChanged
-		{
-			add { CommandManager.RequerySuggested += value; }
-			remove { CommandManager.RequerySuggested -= value; }
-		}
+		public event EventHandler CanExecuteChanged;
 
 		private bool _isExecuting;
 		private readonly Func<Task> _execute;
 		private readonly Func<bool> _canExecute;
 		private readonly IErrorHandler _errorHandler;
 
-		public AsyncCommand(Func<Task> execute,
+		public AsyncCommand(
+			Func<Task> execute,
 			Func<bool> canExecute = null,
 			IErrorHandler errorHandler = null)
 		{
@@ -67,10 +52,11 @@ namespace RightMoveApp.ViewModel.Commands
 
 		public void RaiseCanExecuteChanged()
 		{
-			// CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+			CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 		}
 
 		#region Explicit implementations
+
 		bool ICommand.CanExecute(object parameter)
 		{
 			return CanExecute();
@@ -80,6 +66,7 @@ namespace RightMoveApp.ViewModel.Commands
 		{
 			ExecuteAsync().FireAndForgetSafeAsync(_errorHandler);
 		}
+
 		#endregion
 	}
 
@@ -110,23 +97,16 @@ namespace RightMoveApp.ViewModel.Commands
 			{
 				try
 				{
-					System.Diagnostics.Debug.WriteLine("Trying to execute");
 					_isExecuting = true;
+					RaiseCanExecuteChanged();
 					await _execute(parameter);
-				}
-				catch (Exception ex)
-				{
-
 				}
 				finally
 				{
 					_isExecuting = false;
 				}
 			}
-			else
-			{
-				// here
-			}
+
 			RaiseCanExecuteChanged();
 		}
 
@@ -136,15 +116,17 @@ namespace RightMoveApp.ViewModel.Commands
 		}
 
 		#region Explicit implementations
+
 		bool ICommand.CanExecute(object parameter)
 		{
-			return CanExecute((T)parameter);
+			return CanExecute((T) parameter);
 		}
 
 		void ICommand.Execute(object parameter)
 		{
-			ExecuteAsync((T)parameter).FireAndForgetSafeAsync(_errorHandler);
+			ExecuteAsync((T) parameter).FireAndForgetSafeAsync(_errorHandler);
 		}
+
 		#endregion
 	}
 }

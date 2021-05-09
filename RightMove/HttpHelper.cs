@@ -25,13 +25,33 @@ namespace RightMove
 			return document;
 		}
 				
-		public static byte[] DownloadRemoveImage(string uri, CancellationToken cancellationToken = default(CancellationToken))
+		public static byte[] DownloadImage(string uri, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			using (WebClient client = new WebClient())
 			{
 				// client.DownloadDataAsync(uri, cancellationToken);
 				byte[] pic = client.DownloadData(uri);
 				return pic;
+			}
+		}
+
+		public static byte[] DownloadImageAsync(string uri, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			using (WebClient client = new WebClient())
+			{
+				byte[] data = null;
+				client.DownloadDataCompleted += delegate(object sender, DownloadDataCompletedEventArgs e)
+				{
+					data = e.Result;
+				};
+
+				client.DownloadDataAsync(new Uri(uri), cancellationToken);
+				while (client.IsBusy)
+				{
+					Task.Delay(100, cancellationToken);
+				}
+
+				return data;
 			}
 		}
 	}
