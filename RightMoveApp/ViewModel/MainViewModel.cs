@@ -393,8 +393,6 @@ namespace RightMoveApp.ViewModel
 			System.Diagnostics.Debug.WriteLine("Started running");
 			_selectedItemChangedTimer.Stop();
 
-			_dbService.SaveProperty(RightMoveSelectedItem);
-			
 			try
 			{
 				CancellationToken cancellationToken = _tokenSource.Token;
